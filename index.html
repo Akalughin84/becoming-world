@@ -11,14 +11,27 @@
 <body>
   <div class="container">
     <h1>🌱 Becoming</h1>
-    <p class="greeting">Ты здесь. Это уже победа.</p>
+    <p class="greeting">Загрузка...</p>
 
     <div class="menu">
-      <button onclick="writeLetter()">Написать письмо</button>
-      <button onclick="showInsight()">Прозрение</button>
-      <button onclick="playRain()">Дождь</button>
-      <button onclick="showGarden()">Сад</button>
-      <button onclick="showWeather()">Погода внутри</button>
+      <button onclick="writeLetter()">📝 Написать письмо</button>
+      <button onclick="showForgiveness()">📬 Письмо прощению</button>
+      <button onclick="saveDream()">🌌 Записать сон</button>
+      <button onclick="logSilence()">🕯 Просто быть (3 мин)</button>
+    </div>
+
+    <div class="menu">
+      <button onclick="playNature('rain')">🌧️ Дождь</button>
+      <button onclick="playNature('fire')">🔥 Огонь</button>
+      <button onclick="playNature('ocean')">🌊 Океан</button>
+      <button onclick="showWeather()">🌤️ Погода внутри</button>
+    </div>
+
+    <div class="menu">
+      <button onclick="showGarden()">🌷 Сад</button>
+      <button onclick="showInsight()">✨ Прозрение</button>
+      <button onclick="showMap()">🗺 Карта роста</button>
+      <button onclick="showWords()">📖 Словарь сердца</button>
     </div>
 
     <div id="modal" class="modal" style="display: none;">

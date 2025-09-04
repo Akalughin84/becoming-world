@@ -3,52 +3,68 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Becoming</title>
+  <meta name="description" content="Becoming — приложение, которое помогает быть здесь и сейчас. Не для продуктивности. Для присутствия." />
+  <title>Becoming — Ты здесь. Это уже победа.</title>
+  
+  <!-- PWA -->
   <link rel="manifest" href="manifest.json" />
-  <link rel="stylesheet" href="style.css" />
   <link rel="icon" href="icon-192.png" type="image/png" />
+  <link rel="apple-touch-icon" href="icon-192.png" />
+  
+  <!-- Стили -->
+  <link rel="stylesheet" href="style.css" />
+  
+  <!-- Предотвращение индексации (личное приложение) -->
+  <meta name="robots" content="noindex, nofollow" />
 </head>
 <body>
   <div class="container">
     <h1>🌱 Becoming</h1>
     <p class="greeting">Загрузка...</p>
 
+    <!-- Основные действия -->
     <div class="menu">
-      <button onclick="writeLetter()">📝 Написать письмо</button>
-      <button onclick="showForgiveness()">📬 Письмо прощению</button>
-      <button onclick="saveDream()">🌌 Записать сон</button>
-      <button onclick="logSilence()">🕯 Просто быть (3 мин)</button>
+      <button type="button" onclick="writeLetter()">📝 Написать письмо себе</button>
+      <button type="button" onclick="showForgiveness()">📬 Письмо прощению</button>
+      <button type="button" onclick="saveDream()">🌌 Записать сон</button>
+      <button type="button" onclick="logSilence()">🕯 Просто быть (3 мин)</button>
     </div>
 
+    <!-- Природа и состояние -->
     <div class="menu">
-      <button onclick="playNature('rain')">🌧️ Дождь</button>
-      <button onclick="playNature('fire')">🔥 Огонь</button>
-      <button onclick="playNature('ocean')">🌊 Океан</button>
-      <button onclick="showWeather()">🌤️ Погода внутри</button>
+      <button type="button" onclick="playNature('rain')">🌧️ Дождь</button>
+      <button type="button" onclick="playNature('fire')">🔥 Огонь</button>
+      <button type="button" onclick="playNature('ocean')">🌊 Океан</button>
+      <button type="button" onclick="showWeather()">🌤️ Погода внутри</button>
     </div>
 
+    <!-- Рефлексия и рост -->
     <div class="menu">
-      <button onclick="showGarden()">🌷 Сад</button>
-      <button onclick="showInsight()">✨ Прозрение</button>
-      <button onclick="showMap()">🗺 Карта роста</button>
-      <button onclick="showWords()">📖 Словарь сердца</button>
+      <button type="button" onclick="showGarden()">🌷 Сад</button>
+      <button type="button" onclick="showInsight()">✨ Прозрение</button>
+      <button type="button" onclick="showMap()">🗺 Карта роста</button>
+      <button type="button" onclick="showWords()">📖 Словарь сердца</button>
     </div>
 
-    <div id="modal" class="modal" style="display: none;">
+    <!-- Модальное окно -->
+    <div id="modal" class="modal" role="dialog" aria-labelledby="modal-title" aria-hidden="true">
       <div class="modal-content">
-        <span class="close" onclick="closeModal()">&times;</span>
-        <div id="modal-body"></div>
+        <button class="close" aria-label="Закрыть" onclick="closeModal()">&times;</button>
+        <div id="modal-body" id="modal-title"></div>
       </div>
     </div>
 
+    <!-- Подвал -->
     <p class="footer">
-      Создано <strong>Алексей Калугин</strong> — 2025<br>
-      <small>Ты здесь. Это уже победа.</small><br><br>
-      <button class="small" onclick="showDonate()">
+      Создано с заботой — <strong>Алексей Калугин</strong>, 2025<br>
+      <small>Не для продуктивности. Для присутствия.<br>Ты здесь. Это уже победа.</small><br><br>
+      <button class="small" type="button" onclick="showDonate()">
         💚 Поддержать Becoming (добровольно)
       </button>
     </p>
   </div>
+
+  <!-- Скрипт -->
   <script src="app.js"></script>
 </body>
 </html>

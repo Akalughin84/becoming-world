@@ -3,18 +3,16 @@
 // Не для продуктивности. Для присутствия.
 // Ты здесь. Это уже победа.
 
-// === Глобальные данные ===
 const userData = {
   wordCounts: {},
   dailyWords: [],
-  silenceMoments: [],
   letters: [],
   dreams: [],
   forgiveness: [],
+  silenceMoments: [],
   lastLetter: null
 };
 
-// Загружаем данные из localStorage
 function loadData() {
   const saved = localStorage.getItem('becoming_data');
   if (saved) {
@@ -22,25 +20,22 @@ function loadData() {
   }
 }
 
-// Сохраняем данные
 function saveData() {
   localStorage.setItem('becoming_data', JSON.stringify(userData));
 }
 
-// Инициализация
 loadData();
 
 // === Слово дня ===
 function getDailyWord() {
   const themes = {
-    fear: ["Верь", "Ты сильнее страха", "Иди", "Ты не один"],
-    tired: ["Отдыхай", "Ты сделал достаточно", "Дыши", "Ты здесь"],
     default: ["Дыши", "Ты здесь", "Это достаточно", "Иди", "Верь", "Будь"]
   };
 
-  const usedToday = userData.dailyWords.filter(w => 
-    new Date(w.date).toDateString() === new Date().toDateString()
-  ).map(w => w.word);
+  const today = new Date().toDateString();
+  const usedToday = userData.dailyWords.filter(w => new Date(w.date).toDateString() === today);
+
+  if (usedToday.length > 0) return usedToday[0].word;
 
   const available = themes.default.filter(w => !usedToday.includes(w));
   const word = available.length > 0 ? available[Math.floor(Math.random() * available.length)] : "Будь";
@@ -50,14 +45,14 @@ function getDailyWord() {
   return word;
 }
 
-// === Прозрения по триггерам ===
+// === Прозрения ===
 function getInsight() {
   const insights = [
-    { condition: () => userData.wordCounts.страх > (userData.wordCounts.вера || 0) + 3,
+    { condition: () => (userData.wordCounts.страх || 0) > (userData.wordCounts.вера || 0) + 3,
       message: "Ты боишься больше, чем веришь. Но ты идёшь — это и есть вера." },
-    { condition: () => userData.wordCounts.устал > 5 && userData.wordCounts.здесь > 3,
+    { condition: () => (userData.wordCounts.устал || 0) > 5 && (userData.wordCounts.здесь || 0) > 3,
       message: "Ты устаёшь, защищая присутствие. Это не слабость. Это любовь." },
-    { condition: () => userData.wordCounts.не_знаю > 10,
+    { condition: () => (userData.wordCounts.не_знаю || 0) > 10,
       message: "Ты не знаешь пути. Но ты знаешь, чего хочешь. Этого хватит." },
     { condition: () => true,
       message: "Ты уже не идёшь сквозь туман. Ты — свет." }
@@ -75,19 +70,39 @@ function writeLetter() {
   if (text) {
     userData.letters.push({
       content: text,
-      timestamp: new Date().toISOString(),
-      delivered: false
+      timestamp: new Date().toISOString()
     });
-    userData.lastLetter = new Date().toISOString();
     saveData();
-    showModal("📬 Ты написал письмо. Оно будет ждать.");
+    showModal("✉️ Письмо отправлено.");
   }
 }
 
-// === Прозрение ===
-function showInsight() {
-  const insight = getInsight();
-  showModal("✨ " + insight);
+// === Письмо прощению ===
+function showForgiveness() {
+  const recipient = prompt("Кому ты хочешь простить? (например: себе, маме)");
+  const content = prompt("Напиши своё письмо:");
+  if (content) {
+    userData.forgiveness.push({
+      recipient: recipient || "тому, кто ждал",
+      text: content,
+      date: new Date().toISOString()
+    });
+    saveData();
+    showModal("✅ Ты сказал. Это важно.");
+  }
+}
+
+// === Сон ===
+function saveDream() {
+  const dream = prompt("Расскажи сон:");
+  if (dream) {
+    userData.dreams.push({
+      text: dream,
+      timestamp: new Date().toISOString()
+    });
+    saveData();
+    showModal("🌌 Сон сохранён.");
+  }
 }
 
 // === Тишина ===
@@ -97,17 +112,33 @@ function logSilence() {
   showModal("🧘 Ты был. Это уже присутствие.");
 }
 
+// === Природа ===
+function playNature(sound) {
+  const audio = new Audio(`sounds/${sound}.mp3`);
+  audio.loop = true;
+  audio.play();
+  showModal(`🎧 ${sound === 'rain' ? '🌧️ Дождь' : 
+                    sound === 'fire' ? '🔥 Огонь' : 
+                    sound === 'ocean' ? '🌊 Океан' : '🌬️ Дыхание'} идёт. Нажми 'Пауза'.`, "rain");
+}
+
+function stopAudio() {
+  const audios = document.querySelectorAll('audio');
+  audios.forEach(a => a.pause());
+  document.querySelector('#modal').style.display = 'none';
+}
+
 // === Сад ===
 function showGarden() {
   const hereCount = userData.wordCounts.здесь || 0;
   const flowers = "🌼".repeat(Math.max(1, Math.floor(hereCount / 3)));
   const message = hereCount < 3 
-    ? "Семя ещё в земле. Оно растёт." 
+    ? "Семя ещё в земле. Оно растёт."
     : "Ты уже не садишь. Ты — сад.";
   showModal(`🌷 Твой внутренний сад:\n\n${flowers}\n\n${message}`);
 }
 
-// === Внутренняя погода ===
+// === Погода ===
 function showWeather() {
   const totalWords = Object.values(userData.wordCounts).reduce((a,b) => a+b, 0);
   let weather, symbol, advice;
@@ -129,62 +160,39 @@ function showWeather() {
   showModal(`${symbol} Сегодня в тебе: ${weather}.\n\n${advice}`);
 }
 
-// === Погода в словах ===
-function updateGreeting() {
-  const word = getDailyWord();
-  document.querySelector('.greeting').textContent = `Ты здесь. Это уже победа.\n🌱 Слово дня: ${word}`;
+// === Прозрение ===
+function showInsight() {
+  const insight = getInsight();
+  showModal("✨ " + insight);
 }
 
-// === Природа ===
-function playRain() {
-  const audio = new Audio('sounds/rain.mp3'); // положи в папку /sounds
-  audio.loop = true;
-  audio.play();
-  showModal("🌧️ Дождь идёт. Нажми 'Пауза', чтобы остановить.", "rain");
+// === Словарь сердца ===
+function showWords() {
+  const words = Object.keys(userData.wordCounts)
+    .map(w => `${w} • (${userData.wordCounts[w]})`)
+    .join('\n') || "Пока пусто";
+  showModal(`📖 Словарь твоего сердца:\n\n${words}`);
 }
 
-function stopAudio() {
-  const audios = document.querySelectorAll('audio');
-  audios.forEach(a => a.pause());
-  document.querySelector('#modal').style.display = 'none';
-}
+// === Карта роста ===
+function showMap() {
+  const axes = [
+    { neg: "не знаю", pos: "здесь", label: "Глубина" },
+    { neg: "один", pos: "связь", label: "Связь" },
+    { neg: "устал", pos: "покой", label: "Энергия" },
+    { neg: "страх", pos: "вера", label: "Смелость" }
+  ];
 
-// === Умная модалка ===
-function showModal(message, type = null) {
-  const modalBody = document.getElementById('modal-body');
-  modalBody.innerHTML = `<p>${message}</p>`;
-  
-  if (type === "rain") {
-    modalBody.innerHTML += `<button onclick="stopAudio()">⏸️ Пауза</button>`;
-  } else {
-    modalBody.innerHTML += `<button onclick="closeModal()">Закрыть</button>`;
-  }
-  
-  document.getElementById('modal').style.display = 'flex';
-}
+  let map = "🗺 Визуальная карта роста\n\n";
+  axes.forEach(ax => {
+    const neg = userData.wordCounts[ax.neg] || 0;
+    const pos = userData.wordCounts[pos] || 0;
+    const diff = pos - neg;
+    const bar = "🌑".repeat(20 - Math.min(20, Math.max(0, diff))) + "🌱".repeat(Math.min(20, Math.max(0, diff)));
+    map += `${ax.neg.toUpperCase()} ${bar} ${ax.pos.toUpperCase()} (${diff:+d})\n`;
+  });
 
-function closeModal() {
-  document.getElementById('modal').style.display = 'none';
-}
-
-// === Запуск ===
-window.onload = () => {
-  updateGreeting();
-  checkEveningRitual();
-};
-
-// === Вечерний ритуал ===
-function checkEveningRitual() {
-  const now = new Date();
-  if (now.getHours() >= 20) {
-    const did = confirm("Время вечернего ритуала. Закрыть день тремя словами?");
-    if (did) {
-      const q1 = prompt("Что важно?");
-      const q2 = prompt("За что благодарю?");
-      const q3 = prompt("Что отпускаю?");
-      showModal(`🌙 Ты закрыл день:\n\n${q1 || '...'}\n${q2 || '...'}\n${q3 || '...'}`);
-    }
-  }
+  showModal(map);
 }
 
 // === Донаты ===
@@ -224,7 +232,31 @@ function showDonate() {
   document.body.appendChild(modal);
 }
 
-// PWA
+// === Модалка ===
+function showModal(message, type = null) {
+  const modalBody = document.getElementById('modal-body');
+  modalBody.innerHTML = `<p>${message.replace(/\n/g, '<br>')}</p>`;
+  
+  if (type === "rain") {
+    modalBody.innerHTML += `<button onclick="stopAudio()">⏸️ Пауза</button>`;
+  } else {
+    modalBody.innerHTML += `<button onclick="closeModal()">Закрыть</button>`;
+  }
+  
+  document.getElementById('modal').style.display = 'flex';
+}
+
+function closeModal() {
+  document.getElementById('modal').style.display = 'none';
+}
+
+// === Запуск ===
+window.onload = () => {
+  const word = getDailyWord();
+  document.querySelector('.greeting').textContent = `Ты здесь. Это уже победа.\n🌱 Слово дня: ${word}`;
+};
+
+// === PWA ===
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('/sw.js');

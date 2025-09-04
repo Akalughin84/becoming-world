@@ -1,5 +1,5 @@
 // app.js
-// 🌱 Becoming — создано Victor Vale, 2025
+// 🌱 Becoming — создано Алексей Калугин, 2025
 // Не для продуктивности. Для присутствия.
 // Ты здесь. Это уже победа.
 
@@ -15,7 +15,6 @@ const NATURE_SOUNDS = {
   ocean: "🌊 Океан"
 };
 
-// Теперь слова короткие и соответствуют осям роста
 const DAILY_WORDS = ["Дыши", "здесь", "достаточно", "иди", "верь", "будь"];
 
 const GROWTH_AXES = [
@@ -66,6 +65,30 @@ function saveData() {
 
 loadData();
 
+// === Голос: Web Speech API ===
+function speak(text, emotion = "calm") {
+  if (!window.speechSynthesis) return;
+  window.speechSynthesis.cancel();
+
+  const utterance = new SpeechSynthesisUtterance(text);
+  utterance.lang = 'ru-RU';
+  utterance.rate = 0.9;
+  utterance.pitch = 0.8;
+
+  if (emotion === "soft") {
+    utterance.rate = 0.7;
+    utterance.pitch = 0.7;
+  } else if (emotion === "urgent") {
+    utterance.rate = 1.1;
+    utterance.pitch = 1.0;
+  } else if (emotion === "calm") {
+    utterance.rate = 0.8;
+    utterance.pitch = 0.75;
+  }
+
+  window.speechSynthesis.speak(utterance);
+}
+
 // === Слово дня ===
 function getDailyWord() {
   const today = new Date().toDateString();
@@ -89,10 +112,10 @@ function writeLetter() {
       content: text.trim(),
       timestamp: new Date().toISOString()
     });
-    // Логируем слово
     logWord("связь");
     saveData();
     showModal("✉️ Письмо отправлено.");
+    speak("Письмо отправлено.", "soft");
   }
 }
 
@@ -109,6 +132,7 @@ function showForgiveness() {
     logWord("покой");
     saveData();
     showModal("✅ Ты сказал. Это важно.");
+    speak("Ты сказал. Это важно.", "calm");
   }
 }
 
@@ -123,6 +147,7 @@ function saveDream() {
     logWord("глубина");
     saveData();
     showModal("🌌 Сон сохранён.");
+    speak("Сон сохранён. Я помню.", "soft");
   }
 }
 
@@ -132,6 +157,7 @@ function logSilence() {
   logWord("покой");
   saveData();
   showModal("🧘 Ты был. Это уже присутствие.");
+  speak("Ты был. Это уже присутствие.", "soft");
 }
 
 // === Природа ===
@@ -178,6 +204,7 @@ function showMap() {
     map += `${ax.neg.toUpperCase()} ${bar} ${ax.pos.toUpperCase()} (${sign}${diff})\n`;
   });
   showModal(map);
+  speak("Карта роста показана.", "calm");
 }
 
 // === Словарь сердца ===
@@ -186,6 +213,7 @@ function showWords() {
     .map(w => `${w} • (${userData.wordCounts[w]})`)
     .join('\n') || "Пока пусто";
   showModal(`📖 Словарь твоего сердца:\n\n${words}`);
+  speak("Словарь сердца показан.", "calm");
 }
 
 // === Сад ===
@@ -196,11 +224,14 @@ function showGarden() {
     ? "Семя ещё в земле. Оно растёт." 
     : "Ты уже не садишь. Ты — сад.";
   showModal(`🌷 Твой внутренний сад:\n\n${flowers}\n\n${message}`);
+  speak("Твой внутренний сад показан.", "calm");
 }
 
 // === Прозрение ===
 function showInsight() {
-  showModal("✨ Ты уже не идёшь сквозь туман. Ты — свет.");
+  const insight = "Ты уже не идёшь сквозь туман. Ты — свет.";
+  showModal(`✨ ${insight}`);
+  speak(insight, "calm");
 }
 
 // === Погода внутри ===
@@ -222,7 +253,9 @@ function showWeather() {
     advice = "Ты не растёшь. Ты — основа.";
   }
 
-  showModal(`${symbol} Сегодня в тебе: ${weather}.\n\n${advice}`);
+  const message = `${symbol} Сегодня в тебе: ${weather}. ${advice}`;
+  showModal(message);
+  speak(advice, "calm");
 }
 
 // === Поддержка ===
@@ -253,19 +286,18 @@ function showDonate() {
           💙 Поддержать на Ko-fi
         </a>
       </div>
-      <button class="close-modal" 
+      <button class="close-donate" 
               style="background: #333; border: none; padding: 8px 16px; border-radius: 6px; color: #ccc; cursor: pointer;">
         Закрыть
       </button>
     </div>
   `;
   document.body.appendChild(modal);
-  modal.querySelector('.close-modal').addEventListener('click', () => modal.remove());
+  modal.querySelector('.close-donate').addEventListener('click', () => modal.remove());
 }
 
 // === Модальное окно (динамическое) ===
 function showModal(message, type = null) {
-  // Если уже есть модальное окно — не добавляем
   if (document.querySelector('.becoming-modal')) return;
 
   const modal = document.createElement('div');
@@ -293,7 +325,6 @@ function showModal(message, type = null) {
   `;
   document.body.appendChild(modal);
 
-  // Обработчики
   const closeModal = () => modal.remove();
   modal.querySelector('.close-modal').addEventListener('click', closeModal);
 
@@ -316,5 +347,6 @@ document.addEventListener('DOMContentLoaded', () => {
   if (greeting) {
     const word = getDailyWord();
     greeting.textContent = `Ты здесь. Это уже победа.\n🌱 Слово дня: ${word}`;
+    speak(`Ты здесь. Это уже победа. Слово дня: ${word}`, "soft");
   }
 });

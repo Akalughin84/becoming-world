@@ -5,16 +5,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="description" content="Becoming — приложение, которое помогает быть здесь и сейчас. Не для продуктивности. Для присутствия." />
   <title>Becoming — Ты здесь. Это уже победа.</title>
-  
   <!-- PWA -->
   <link rel="manifest" href="manifest.json" />
   <link rel="icon" href="icon-192.png" type="image/png" />
   <link rel="apple-touch-icon" href="icon-192.png" />
-  
   <!-- Стили -->
   <link rel="stylesheet" href="style.css" />
-  
-  <!-- Предотвращение индексации (личное приложение) -->
+  <!-- Предотвращение индексации -->
   <meta name="robots" content="noindex, nofollow" />
 </head>
 <body>
@@ -27,8 +24,11 @@
       <h2 class="menu-title">📬 Письма и память</h2>
       <div class="menu-buttons">
         <button type="button" onclick="writeLetter()">📝 Написать письмо себе</button>
+        <button type="button" onclick="viewLetters()">📚 Просмотреть письма</button>
         <button type="button" onclick="showForgiveness()">📬 Письмо прощению</button>
+        <button type="button" onclick="viewForgiveness()">📚 Просмотреть прощения</button>
         <button type="button" onclick="saveDream()">🌌 Записать сон</button>
+        <button type="button" onclick="viewDreams()">📚 Просмотреть сны</button>
       </div>
     </section>
 
@@ -62,13 +62,15 @@
       </div>
     </section>
 
-    <!-- Модальное окно -->
-    <div id="modal" class="modal" role="dialog" aria-labelledby="modal-title" aria-hidden="true">
-      <div class="modal-content">
-        <button class="close" aria-label="Закрыть" onclick="closeModal()">&times;</button>
-        <div id="modal-body" id="modal-title"></div>
+    <!-- 5. Данные и тема -->
+    <section class="menu-section">
+      <h2 class="menu-title">⚙️ Инструменты</h2>
+      <div class="menu-buttons">
+        <button type="button" onclick="exportData()">💾 Экспорт данных</button>
+        <button type="button" onclick="importData()">📁 Импорт данных</button>
+        <button type="button" onclick="toggleTheme()">🌙 / ☀️ Тема</button>
       </div>
-    </div>
+    </section>
 
     <!-- Подвал -->
     <p class="footer">
@@ -80,7 +82,6 @@
     </p>
   </div>
 
-  <!-- Скрипт -->
   <script src="app.js"></script>
 </body>
 </html>

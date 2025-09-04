@@ -1,18 +1,17 @@
 // app.js
 // 🌱 Becoming — создано Алексей Калугин, 2025
-// Не для продуктивности. Для присутствия.
-// Ты здесь. Это уже победа.
 
+// === Глобальные данные ===
 const userData = {
   wordCounts: {},
   dailyWords: [],
   letters: [],
   dreams: [],
   forgiveness: [],
-  silenceMoments: [],
-  lastLetter: null
+  silenceMoments: []
 };
 
+// === Загрузка/сохранение ===
 function loadData() {
   const saved = localStorage.getItem('becoming_data');
   if (saved) {
@@ -24,44 +23,21 @@ function saveData() {
   localStorage.setItem('becoming_data', JSON.stringify(userData));
 }
 
+// Вызываем при старте
 loadData();
 
 // === Слово дня ===
 function getDailyWord() {
-  const themes = {
-    default: ["Дыши", "Ты здесь", "Это достаточно", "Иди", "Верь", "Будь"]
-  };
-
   const today = new Date().toDateString();
   const usedToday = userData.dailyWords.filter(w => new Date(w.date).toDateString() === today);
-
   if (usedToday.length > 0) return usedToday[0].word;
 
-  const available = themes.default.filter(w => !usedToday.includes(w));
-  const word = available.length > 0 ? available[Math.floor(Math.random() * available.length)] : "Будь";
+  const words = ["Дыши", "Ты здесь", "Это достаточно", "Иди", "Верь", "Будь"];
+  const word = words[Math.floor(Math.random() * words.length)];
 
   userData.dailyWords.push({ word, date: new Date().toISOString() });
   saveData();
   return word;
-}
-
-// === Прозрения ===
-function getInsight() {
-  const insights = [
-    { condition: () => (userData.wordCounts.страх || 0) > (userData.wordCounts.вера || 0) + 3,
-      message: "Ты боишься больше, чем веришь. Но ты идёшь — это и есть вера." },
-    { condition: () => (userData.wordCounts.устал || 0) > 5 && (userData.wordCounts.здесь || 0) > 3,
-      message: "Ты устаёшь, защищая присутствие. Это не слабость. Это любовь." },
-    { condition: () => (userData.wordCounts.не_знаю || 0) > 10,
-      message: "Ты не знаешь пути. Но ты знаешь, чего хочешь. Этого хватит." },
-    { condition: () => true,
-      message: "Ты уже не идёшь сквозь туман. Ты — свет." }
-  ];
-
-  for (let rule of insights) {
-    if (rule.condition()) return rule.message;
-  }
-  return "Пока тишина…";
 }
 
 // === Письмо ===
@@ -79,7 +55,7 @@ function writeLetter() {
 
 // === Письмо прощению ===
 function showForgiveness() {
-  const recipient = prompt("Кому ты хочешь простить? (например: себе, маме)");
+  const recipient = prompt("Кому ты хочешь простить?");
   const content = prompt("Напиши своё письмо:");
   if (content) {
     userData.forgiveness.push({
@@ -114,23 +90,19 @@ function logSilence() {
 
 // === Природа ===
 function playNature(sound) {
-  const audio = new Audio(`sounds/${sound}.mp3`);
-  audio.loop = true;
-  audio.play();
-  showModal(`🎧 ${sound === 'rain' ? '🌧️ Дождь' : 
-                    sound === 'fire' ? '🔥 Огонь' : 
-                    sound === 'ocean' ? '🌊 Океан' : '🌬️ Дыхание'} идёт. Нажми 'Пауза'.`, "rain");
-}
-
-function stopAudio() {
-  const audios = document.querySelectorAll('audio');
-  audios.forEach(a => a.pause());
-  document.querySelector('#modal').style.display = 'none';
+  try {
+    const audio = new Audio(`sounds/${sound}.mp3`);
+    audio.loop = true;
+    audio.play();
+    showModal(`🎧 ${sound === 'rain' ? '🌧️ Дождь' : sound === 'fire' ? '🔥 Огонь' : '🌊 Океан'} идёт. Нажми 'Пауза'.`, "rain");
+  } catch (e) {
+    showModal("⚠️ Звук недоступен. Включи файлы в папку /sounds");
+  }
 }
 
 // === Сад ===
 function showGarden() {
-  const hereCount = userData.wordCounts.здесь || 0;
+  const hereCount = (userData.wordCounts.здесь || 0);
   const flowers = "🌼".repeat(Math.max(1, Math.floor(hereCount / 3)));
   const message = hereCount < 3 
     ? "Семя ещё в земле. Оно растёт."
@@ -162,7 +134,7 @@ function showWeather() {
 
 // === Прозрение ===
 function showInsight() {
-  const insight = getInsight();
+  const insight = "Ты уже не идёшь сквозь туман. Ты — свет.";
   showModal("✨ " + insight);
 }
 
@@ -186,7 +158,7 @@ function showMap() {
   let map = "🗺 Визуальная карта роста\n\n";
   axes.forEach(ax => {
     const neg = userData.wordCounts[ax.neg] || 0;
-    const pos = userData.wordCounts[pos] || 0;
+    const pos = userData.wordCounts[ax.pos] || 0;
     const diff = pos - neg;
     const bar = "🌑".repeat(20 - Math.min(20, Math.max(0, diff))) + "🌱".repeat(Math.min(20, Math.max(0, diff)));
     map += `${ax.neg.toUpperCase()} ${bar} ${ax.pos.toUpperCase()} (${diff:+d})\n`;
@@ -250,15 +222,14 @@ function closeModal() {
   document.getElementById('modal').style.display = 'none';
 }
 
+function stopAudio() {
+  const audios = document.querySelectorAll('audio');
+  audios.forEach(a => a.pause());
+  closeModal();
+}
+
 // === Запуск ===
 window.onload = () => {
   const word = getDailyWord();
   document.querySelector('.greeting').textContent = `Ты здесь. Это уже победа.\n🌱 Слово дня: ${word}`;
 };
-
-// === PWA ===
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/sw.js');
-  });
-}

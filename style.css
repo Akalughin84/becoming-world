@@ -1,4 +1,6 @@
 /* style.css */
+/* 🌱 Becoming — стиль как дыхание */
+
 * {
   box-sizing: border-box;
   margin: 0;
@@ -15,6 +17,8 @@ body {
   justify-content: center;
   align-items: center;
   padding: 20px;
+  background-image: radial-gradient(circle at 20% 30%, rgba(44, 122, 44, 0.03) 0%, transparent 50%),
+                    radial-gradient(circle at 80% 70%, rgba(44, 122, 44, 0.03) 0%, transparent 50%);
 }
 
 .container {
@@ -25,12 +29,14 @@ body {
   padding: 24px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
   text-align: center;
+  backdrop-filter: blur(10px);
 }
 
 h1 {
   font-size: 1.8rem;
   color: #2c7a2c;
   margin-bottom: 16px;
+  font-weight: 600;
 }
 
 .greeting {
@@ -39,15 +45,31 @@ h1 {
   margin-bottom: 24px;
   white-space: pre-line;
   font-style: italic;
+  line-height: 1.7;
 }
 
-.menu {
-  margin: 16px 0;
+/* === Секции меню === */
+.menu-section {
+  margin: 24px 0;
+}
+
+.menu-title {
+  font-size: 0.9rem;
+  color: #666;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 12px;
+  font-weight: 600;
+  text-align: left;
+}
+
+.menu-buttons {
   display: grid;
   grid-template-columns: 1fr;
   gap: 12px;
 }
 
+/* === Кнопки === */
 button {
   background: #f1f3f5;
   border: 1px solid #dfe1e5;
@@ -56,35 +78,54 @@ button {
   font-size: 1rem;
   color: #202124;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.2s ease;
   text-align: left;
+  font-weight: 500;
 }
 
 button:hover {
   background: #e8eaed;
+  border-color: #cfd2d7;
   transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
 
 button:active {
   transform: translateY(0);
 }
 
+/* === Кнопка "поддержать" === */
 .small {
   font-size: 0.9rem;
   padding: 8px 12px;
+  background: transparent;
+  border: none;
+  color: #2c7a2c;
+  text-decoration: underline;
+  cursor: pointer;
 }
 
+.small:hover {
+  color: #1a5d1a;
+  background: transparent;
+  text-decoration: underline;
+}
+
+/* === Подвал === */
 .footer {
   margin-top: 32px;
   color: #666;
   font-size: 0.9rem;
+  line-height: 1.5;
 }
 
 .footer small {
   color: #888;
+  display: block;
+  margin: 4px 0;
 }
 
-/* Модальное окно */
+/* === Модальное окно === */
 .modal {
   display: none;
   position: fixed;
@@ -107,12 +148,19 @@ button:active {
   max-width: 400px;
   text-align: center;
   position: relative;
+  animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.9); }
+  to { opacity: 1; transform: scale(1); }
 }
 
 .modal-content p {
   white-space: pre-line;
   margin-bottom: 16px;
   font-size: 1.1rem;
+  line-height: 1.6;
 }
 
 .modal-content button {
@@ -120,6 +168,15 @@ button:active {
   background: #333;
   color: #ddd;
   border: 1px solid #555;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  min-width: 80px;
+}
+
+.modal-content button:hover {
+  background: #444;
+  border-color: #666;
 }
 
 .close {
@@ -128,8 +185,34 @@ button:active {
   font-size: 28px;
   font-weight: bold;
   cursor: pointer;
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: #333;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
 }
 
 .close:hover {
   color: #fff;
+  background: #555;
+}
+
+/* === Адаптивность === */
+@media (max-width: 480px) {
+  .container {
+    padding: 20px;
+    border-radius: 12px;
+  }
+  h1 {
+    font-size: 1.6rem;
+  }
+  .greeting {
+    font-size: 1rem;
+  }
 }

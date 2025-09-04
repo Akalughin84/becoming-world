@@ -1,48 +1,90 @@
-body {
-  background: #000;
-  color: #aaa;
-  font-family: 'Segoe UI', sans-serif;
-  text-align: center;
+/* style.css */
+* {
+  box-sizing: border-box;
   margin: 0;
-  padding: 40px;
+  padding: 0;
 }
-h1 {
-  color: #4CAF50;
-  font-size: 2rem;
-  margin-bottom: 20px;
-}
-.greeting {
-  color: #777;
-  font-size: 1.2rem;
-  margin-bottom: 30px;
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: #f8f9fa;
+  color: #212529;
   line-height: 1.6;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
 }
-button {
-  background: #1a1a1a;
-  color: #ccc;
-  border: 1px solid #333;
-  padding: 12px 24px;
-  margin: 10px;
-  border-radius: 8px;
-  font-size: 1rem;
-  cursor: pointer;
-  transition: all 0.3s;
+
+.container {
+  max-width: 500px;
+  width: 100%;
+  background: white;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  text-align: center;
 }
-button:hover {
-  background: #2a2a2a;
-  color: #fff;
+
+h1 {
+  font-size: 1.8rem;
+  color: #2c7a2c;
+  margin-bottom: 16px;
 }
-.small {
-  background: transparent;
-  color: #4CAF50;
-  text-decoration: underline;
-  font-size: 0.9rem;
-}
-.footer {
-  margin-top: 60px;
+
+.greeting {
+  font-size: 1.1rem;
   color: #444;
+  margin-bottom: 24px;
+  white-space: pre-line;
+  font-style: italic;
+}
+
+.menu {
+  margin: 16px 0;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+
+button {
+  background: #f1f3f5;
+  border: 1px solid #dfe1e5;
+  border-radius: 12px;
+  padding: 12px 16px;
+  font-size: 1rem;
+  color: #202124;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: left;
+}
+
+button:hover {
+  background: #e8eaed;
+  transform: translateY(-1px);
+}
+
+button:active {
+  transform: translateY(0);
+}
+
+.small {
+  font-size: 0.9rem;
+  padding: 8px 12px;
+}
+
+.footer {
+  margin-top: 32px;
+  color: #666;
   font-size: 0.9rem;
 }
+
+.footer small {
+  color: #888;
+}
+
+/* Модальное окно */
 .modal {
   display: none;
   position: fixed;
@@ -51,22 +93,43 @@ button:hover {
   top: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0,0,0,0.9);
-  align-items: center;
+  background-color: rgba(0, 0, 0, 0.8);
   justify-content: center;
+  align-items: center;
 }
+
 .modal-content {
-  background: #111;
-  padding: 30px;
+  background-color: #1e1e1e;
+  color: #e0e0e0;
+  padding: 24px;
   border-radius: 12px;
+  width: 90%;
   max-width: 400px;
   text-align: center;
-  color: #ccc;
+  position: relative;
 }
+
+.modal-content p {
+  white-space: pre-line;
+  margin-bottom: 16px;
+  font-size: 1.1rem;
+}
+
+.modal-content button {
+  margin: 0 8px;
+  background: #333;
+  color: #ddd;
+  border: 1px solid #555;
+}
+
 .close {
-  color: #777;
+  color: #aaa;
   float: right;
   font-size: 28px;
   font-weight: bold;
   cursor: pointer;
+}
+
+.close:hover {
+  color: #fff;
 }

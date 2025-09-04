@@ -1,11 +1,11 @@
 {
   "name": "Becoming",
-  "short_name": "Становление",
-  "description": "Помогает стать собой. Через присутствие.",
-  "start_url": "/",
+  "short_name": "Becoming",
+  "description": "Приложение, которое помогает стать собой через присутствие.",
+  "start_url": ".",
   "display": "standalone",
-  "background_color": "#000000",
-  "theme_color": "#1a1a1a",
+  "background_color": "#f8f9fa",
+  "theme_color": "#2c7a2c",
   "icons": [
     {
       "src": "icon-192.png",

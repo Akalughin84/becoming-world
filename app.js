@@ -155,7 +155,8 @@ function showMap() {
     const diff = pos - neg;
     const level = Math.max(0, Math.min(20, 20 + diff));
     const bar = "🌑".repeat(20 - level) + "🌱".repeat(level);
-    map += `${ax.neg.toUpperCase()} ${bar} ${ax.pos.toUpperCase()} (${diff:+d})\n`;
+    const sign = diff >= 0 ? '+' : '';
+    map += `${ax.neg.toUpperCase()} ${bar} ${ax.pos.toUpperCase()} (${sign}${diff})\n`;
   });
   showModal(map);
 }
@@ -288,3 +289,4 @@ document.addEventListener('DOMContentLoaded', () => {
     greeting.textContent = `Ты здесь. Это уже победа.\n🌱 Слово дня: ${word}`;
   }
 });
+

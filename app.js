@@ -1,5 +1,5 @@
 // app.js
-// 🌱 Becoming — создано Алексей Калугин, 2025
+// 🌱 Becoming — создано Victor Vale, 2025
 // Не для продуктивности. Для присутствия.
 // Ты здесь. Это уже победа.
 
@@ -15,7 +15,8 @@ const NATURE_SOUNDS = {
   ocean: "🌊 Океан"
 };
 
-const DAILY_WORDS = ["Дыши", "Ты здесь", "Это достаточно", "Иди", "Верь", "Будь"];
+// Теперь слова короткие и соответствуют осям роста
+const DAILY_WORDS = ["Дыши", "здесь", "достаточно", "иди", "верь", "будь"];
 
 const GROWTH_AXES = [
   { neg: "не знаю", pos: "здесь", label: "Глубина" },
@@ -42,7 +43,6 @@ function loadData() {
     if (saved) {
       const parsed = JSON.parse(saved);
       Object.assign(userData, parsed);
-      // Очистка от битых дат
       userData.dailyWords = userData.dailyWords.filter(w => 
         w.date && !isNaN(new Date(w.date).getTime())
       );
@@ -56,7 +56,11 @@ function saveData() {
   try {
     localStorage.setItem('becoming_data', JSON.stringify(userData));
   } catch (e) {
-    console.error("Ошибка сохранения:", e);
+    if (e.name === 'QuotaExceededError') {
+      showModal("⚠️ Слишком много данных. Очисти старые записи.");
+    } else {
+      console.error("Ошибка сохранения:", e);
+    }
   }
 }
 
@@ -85,6 +89,8 @@ function writeLetter() {
       content: text.trim(),
       timestamp: new Date().toISOString()
     });
+    // Логируем слово
+    logWord("связь");
     saveData();
     showModal("✉️ Письмо отправлено.");
   }
@@ -100,6 +106,7 @@ function showForgiveness() {
       text: content.trim(),
       date: new Date().toISOString()
     });
+    logWord("покой");
     saveData();
     showModal("✅ Ты сказал. Это важно.");
   }
@@ -113,6 +120,7 @@ function saveDream() {
       text: dream.trim(),
       timestamp: new Date().toISOString()
     });
+    logWord("глубина");
     saveData();
     showModal("🌌 Сон сохранён.");
   }
@@ -121,18 +129,28 @@ function saveDream() {
 // === Просто быть ===
 function logSilence() {
   userData.silenceMoments.push(new Date().toISOString());
+  logWord("покой");
   saveData();
   showModal("🧘 Ты был. Это уже присутствие.");
 }
 
 // === Природа ===
+let currentAudio = null;
+
 function playNature(sound) {
-  document.querySelectorAll('audio').forEach(a => a.pause());
+  if (currentAudio) {
+    currentAudio.pause();
+    currentAudio = null;
+  }
+
   if (!NATURE_SOUNDS[sound]) return;
 
   try {
     const audio = new Audio(`sounds/${sound}.mp3`);
     audio.loop = true;
+    audio.addEventListener('error', () => {
+      showModal("⚠️ Не удалось загрузить звук. Проверь папку /sounds");
+    });
     const playPromise = audio.play();
     if (playPromise !== undefined) {
       playPromise.catch(e => {
@@ -140,9 +158,10 @@ function playNature(sound) {
         showModal("⚠️ Чтобы включить звук, нажми на страницу.");
       });
     }
+    currentAudio = audio;
     showModal(`🎧 ${NATURE_SOUNDS[sound]} идёт. Нажми 'Пауза'.`, "rain");
   } catch (e) {
-    showModal("⚠️ Звук недоступен. Проверь папку /sounds");
+    showModal("⚠️ Звук недоступен.");
   }
 }
 
@@ -234,51 +253,61 @@ function showDonate() {
           💙 Поддержать на Ko-fi
         </a>
       </div>
-      <button onclick="this.closest('div').remove()" 
-              style="background: #333; border: none; padding: 8px 16px; border-radius: 6px; color: #ccc;">
+      <button class="close-modal" 
+              style="background: #333; border: none; padding: 8px 16px; border-radius: 6px; color: #ccc; cursor: pointer;">
         Закрыть
       </button>
     </div>
   `;
   document.body.appendChild(modal);
+  modal.querySelector('.close-modal').addEventListener('click', () => modal.remove());
 }
 
-// === Модальное окно ===
+// === Модальное окно (динамическое) ===
 function showModal(message, type = null) {
-  const modal = document.getElementById('modal');
-  const modalBody = document.getElementById('modal-body');
-  if (!modal || !modalBody) return;
+  // Если уже есть модальное окно — не добавляем
+  if (document.querySelector('.becoming-modal')) return;
 
-  modalBody.innerHTML = '';
-  const p = document.createElement('p');
-  p.textContent = message;
-  modalBody.appendChild(p);
+  const modal = document.createElement('div');
+  modal.className = 'becoming-modal';
+  modal.style.cssText = `
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.85); color: #eee; display: flex;
+    align-items: center; justify-content: center; z-index: 1000;
+    font-family: 'Segoe UI', sans-serif; font-size: 16px;
+  `;
+  modal.innerHTML = `
+    <div style="background: #1a1a1a; padding: 24px; border-radius: 12px; max-width: 400px; text-align: center;">
+      <p style="white-space: pre-line; margin: 0 0 16px; line-height: 1.5;">${message}</p>
+      <div style="display: flex; justify-content: center; gap: 10px;">
+        ${type === "rain" ? `
+          <button class="pause-audio" style="background: #f44336; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer;">
+            ⏸️ Пауза
+          </button>
+        ` : ''}
+        <button class="close-modal" style="background: #333; color: #ccc; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer;">
+          Закрыть
+        </button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(modal);
 
-  const closeBtn = document.createElement('button');
-  closeBtn.textContent = "Закрыть";
-  closeBtn.type = "button";
-  closeBtn.onclick = closeModal;
+  // Обработчики
+  const closeModal = () => modal.remove();
+  modal.querySelector('.close-modal').addEventListener('click', closeModal);
 
   if (type === "rain") {
-    const pauseBtn = document.createElement('button');
-    pauseBtn.textContent = "⏸️ Пауза";
-    pauseBtn.type = "button";
-    pauseBtn.onclick = stopAudio;
-    modalBody.appendChild(pauseBtn);
-    modalBody.appendChild(document.createElement('br'));
+    modal.querySelector('.pause-audio').addEventListener('click', () => {
+      if (currentAudio) currentAudio.pause();
+      closeModal();
+    });
   }
-
-  modalBody.appendChild(closeBtn);
-  modal.style.display = 'flex';
 }
 
-function closeModal() {
-  document.getElementById('modal').style.display = 'none';
-}
-
-function stopAudio() {
-  document.querySelectorAll('audio').forEach(a => a.pause());
-  closeModal();
+// === Вспомогательные функции ===
+function logWord(word) {
+  userData.wordCounts[word] = (userData.wordCounts[word] || 0) + 1;
 }
 
 // === Загрузка интерфейса ===
@@ -289,4 +318,3 @@ document.addEventListener('DOMContentLoaded', () => {
     greeting.textContent = `Ты здесь. Это уже победа.\n🌱 Слово дня: ${word}`;
   }
 });
-

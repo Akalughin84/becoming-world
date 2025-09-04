@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Becoming</title>
+  <link rel="manifest" href="manifest.json" />
+  <link rel="stylesheet" href="style.css" />
+  <link rel="icon" href="icon-192.png" type="image/png" />
+</head>
+<body>
+  <div class="container">
+    <h1>🌱 Becoming</h1>
+    <p class="greeting">Ты здесь. Это уже победа.</p>
+
+    <div class="menu">
+      <button onclick="writeLetter()">Написать письмо</button>
+      <button onclick="showInsight()">Прозрение</button>
+      <button onclick="playRain()">Дождь</button>
+      <button onclick="showGarden()">Сад</button>
+      <button onclick="showWeather()">Погода внутри</button>
+    </div>
+
+    <div id="modal" class="modal" style="display: none;">
+      <div class="modal-content">
+        <span class="close" onclick="closeModal()">&times;</span>
+        <div id="modal-body"></div>
+      </div>
+    </div>
+
+    <p class="footer">
+      Создано <strong>[Твоё Имя]</strong> — 2025<br>
+      <small>Не тревожь меня. Я жду.</small><br><br>
+      <button class="small" onclick="showDonate()">
+        💚 Поддержать Becoming (добровольно)
+      </button>
+    </p>
+  </div>
+  <script src="app.js"></script>
+</body>
+</html>

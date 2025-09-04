@@ -22,29 +22,45 @@
     <h1>🌱 Becoming</h1>
     <p class="greeting">Загрузка...</p>
 
-    <!-- Основные действия -->
-    <div class="menu">
-      <button type="button" onclick="writeLetter()">📝 Написать письмо себе</button>
-      <button type="button" onclick="showForgiveness()">📬 Письмо прощению</button>
-      <button type="button" onclick="saveDream()">🌌 Записать сон</button>
-      <button type="button" onclick="logSilence()">🕯 Просто быть (3 мин)</button>
-    </div>
+    <!-- 1. Письма и память -->
+    <section class="menu-section">
+      <h2 class="menu-title">📬 Письма и память</h2>
+      <div class="menu-buttons">
+        <button type="button" onclick="writeLetter()">📝 Написать письмо себе</button>
+        <button type="button" onclick="showForgiveness()">📬 Письмо прощению</button>
+        <button type="button" onclick="saveDream()">🌌 Записать сон</button>
+      </div>
+    </section>
 
-    <!-- Природа и состояние -->
-    <div class="menu">
-      <button type="button" onclick="playNature('rain')">🌧️ Дождь</button>
-      <button type="button" onclick="playNature('fire')">🔥 Огонь</button>
-      <button type="button" onclick="playNature('ocean')">🌊 Океан</button>
-      <button type="button" onclick="showWeather()">🌤️ Погода внутри</button>
-    </div>
+    <!-- 2. Присутствие и тишина -->
+    <section class="menu-section">
+      <h2 class="menu-title">🧘 Присутствие и тишина</h2>
+      <div class="menu-buttons">
+        <button type="button" onclick="logSilence()">🕯 Просто быть (3 мин)</button>
+      </div>
+    </section>
 
-    <!-- Рефлексия и рост -->
-    <div class="menu">
-      <button type="button" onclick="showGarden()">🌷 Сад</button>
-      <button type="button" onclick="showInsight()">✨ Прозрение</button>
-      <button type="button" onclick="showMap()">🗺 Карта роста</button>
-      <button type="button" onclick="showWords()">📖 Словарь сердца</button>
-    </div>
+    <!-- 3. Природа и состояние -->
+    <section class="menu-section">
+      <h2 class="menu-title">🌧️ Природа и состояние</h2>
+      <div class="menu-buttons">
+        <button type="button" onclick="playNature('rain')">🌧️ Дождь</button>
+        <button type="button" onclick="playNature('fire')">🔥 Огонь</button>
+        <button type="button" onclick="playNature('ocean')">🌊 Океан</button>
+        <button type="button" onclick="showWeather()">🌤️ Погода внутри</button>
+      </div>
+    </section>
+
+    <!-- 4. Рефлексия и рост -->
+    <section class="menu-section">
+      <h2 class="menu-title">📈 Рефлексия и рост</h2>
+      <div class="menu-buttons">
+        <button type="button" onclick="showGarden()">🌷 Сад</button>
+        <button type="button" onclick="showInsight()">✨ Прозрение</button>
+        <button type="button" onclick="showMap()">🗺 Карта роста</button>
+        <button type="button" onclick="showWords()">📖 Словарь сердца</button>
+      </div>
+    </section>
 
     <!-- Модальное окно -->
     <div id="modal" class="modal" role="dialog" aria-labelledby="modal-title" aria-hidden="true">

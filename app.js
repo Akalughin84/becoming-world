@@ -1,5 +1,6 @@
 // app.js
 // 🌱 Becoming — создано Алексей Калугин, 2025
+// Ты здесь. Это уже победа.
 
 // === Глобальные данные ===
 const userData = {
@@ -23,7 +24,6 @@ function saveData() {
   localStorage.setItem('becoming_data', JSON.stringify(userData));
 }
 
-// Вызываем при старте
 loadData();
 
 // === Слово дня ===
@@ -53,39 +53,10 @@ function writeLetter() {
   }
 }
 
-// === Письмо прощению ===
-function showForgiveness() {
-  const recipient = prompt("Кому ты хочешь простить?");
-  const content = prompt("Напиши своё письмо:");
-  if (content) {
-    userData.forgiveness.push({
-      recipient: recipient || "тому, кто ждал",
-      text: content,
-      date: new Date().toISOString()
-    });
-    saveData();
-    showModal("✅ Ты сказал. Это важно.");
-  }
-}
-
-// === Сон ===
-function saveDream() {
-  const dream = prompt("Расскажи сон:");
-  if (dream) {
-    userData.dreams.push({
-      text: dream,
-      timestamp: new Date().toISOString()
-    });
-    saveData();
-    showModal("🌌 Сон сохранён.");
-  }
-}
-
-// === Тишина ===
-function logSilence() {
-  userData.silenceMoments.push(new Date().toISOString());
-  saveData();
-  showModal("🧘 Ты был. Это уже присутствие.");
+// === Прозрение ===
+function showInsight() {
+  const insight = "Ты уже не идёшь сквозь туман. Ты — свет.";
+  showModal("✨ " + insight);
 }
 
 // === Природа ===
@@ -94,18 +65,18 @@ function playNature(sound) {
     const audio = new Audio(`sounds/${sound}.mp3`);
     audio.loop = true;
     audio.play();
-    showModal(`🎧 ${sound === 'rain' ? '🌧️ Дождь' : sound === 'fire' ? '🔥 Огонь' : '🌊 Океан'} идёт. Нажми 'Пауза'.`, "rain");
+    showModal(`🎧 ${sound === 'rain' ? '🌧️ Дождь' : sound === 'fire' ? '🔥 Огонь' : '🌊 Океан'} идёт. Нажми "Пауза".`, "rain");
   } catch (e) {
-    showModal("⚠️ Звук недоступен. Включи файлы в папку /sounds");
+    showModal("⚠️ Звук недоступен. Проверь папку /sounds");
   }
 }
 
 // === Сад ===
 function showGarden() {
-  const hereCount = (userData.wordCounts.здесь || 0);
+  const hereCount = userData.wordCounts.здесь || 0;
   const flowers = "🌼".repeat(Math.max(1, Math.floor(hereCount / 3)));
   const message = hereCount < 3 
-    ? "Семя ещё в земле. Оно растёт."
+    ? "Семя ещё в земле. Оно растёт." 
     : "Ты уже не садишь. Ты — сад.";
   showModal(`🌷 Твой внутренний сад:\n\n${flowers}\n\n${message}`);
 }
@@ -132,39 +103,28 @@ function showWeather() {
   showModal(`${symbol} Сегодня в тебе: ${weather}.\n\n${advice}`);
 }
 
-// === Прозрение ===
-function showInsight() {
-  const insight = "Ты уже не идёшь сквозь туман. Ты — свет.";
-  showModal("✨ " + insight);
+// === Модалка ===
+function showModal(message, type = null) {
+  const modalBody = document.getElementById('modal-body');
+  modalBody.innerHTML = `<p>${message.replace(/\n/g, '<br>')}</p>`;
+  
+  if (type === "rain") {
+    modalBody.innerHTML += `<button onclick="stopAudio()">⏸️ Пауза</button>`;
+  } else {
+    modalBody.innerHTML += `<button onclick="closeModal()">Закрыть</button>`;
+  }
+  
+  document.getElementById('modal').style.display = 'flex';
 }
 
-// === Словарь сердца ===
-function showWords() {
-  const words = Object.keys(userData.wordCounts)
-    .map(w => `${w} • (${userData.wordCounts[w]})`)
-    .join('\n') || "Пока пусто";
-  showModal(`📖 Словарь твоего сердца:\n\n${words}`);
+function closeModal() {
+  document.getElementById('modal').style.display = 'none';
 }
 
-// === Карта роста ===
-function showMap() {
-  const axes = [
-    { neg: "не знаю", pos: "здесь", label: "Глубина" },
-    { neg: "один", pos: "связь", label: "Связь" },
-    { neg: "устал", pos: "покой", label: "Энергия" },
-    { neg: "страх", pos: "вера", label: "Смелость" }
-  ];
-
-  let map = "🗺 Визуальная карта роста\n\n";
-  axes.forEach(ax => {
-    const neg = userData.wordCounts[ax.neg] || 0;
-    const pos = userData.wordCounts[ax.pos] || 0;
-    const diff = pos - neg;
-    const bar = "🌑".repeat(20 - Math.min(20, Math.max(0, diff))) + "🌱".repeat(Math.min(20, Math.max(0, diff)));
-    map += `${ax.neg.toUpperCase()} ${bar} ${ax.pos.toUpperCase()} (${diff:+d})\n`;
-  });
-
-  showModal(map);
+function stopAudio() {
+  const audios = document.querySelectorAll('audio');
+  audios.forEach(a => a.pause());
+  closeModal();
 }
 
 // === Донаты ===
@@ -202,30 +162,6 @@ function showDonate() {
     </div>
   `;
   document.body.appendChild(modal);
-}
-
-// === Модалка ===
-function showModal(message, type = null) {
-  const modalBody = document.getElementById('modal-body');
-  modalBody.innerHTML = `<p>${message.replace(/\n/g, '<br>')}</p>`;
-  
-  if (type === "rain") {
-    modalBody.innerHTML += `<button onclick="stopAudio()">⏸️ Пауза</button>`;
-  } else {
-    modalBody.innerHTML += `<button onclick="closeModal()">Закрыть</button>`;
-  }
-  
-  document.getElementById('modal').style.display = 'flex';
-}
-
-function closeModal() {
-  document.getElementById('modal').style.display = 'none';
-}
-
-function stopAudio() {
-  const audios = document.querySelectorAll('audio');
-  audios.forEach(a => a.pause());
-  closeModal();
 }
 
 // === Запуск ===

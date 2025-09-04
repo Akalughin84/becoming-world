@@ -8,7 +8,7 @@ const urlsToCache = [
   '/icon-512.png'
   '/sounds/rain.mp3',
   '/sounds/fire.mp3',
-  '/sounds/ocean.mp3'
+  '/sounds/ocean.mp3',
 ];
 
 self.addEventListener('install', event => {
@@ -25,3 +25,4 @@ self.addEventListener('fetch', event => {
   );
 
 });
+

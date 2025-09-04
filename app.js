@@ -41,16 +41,14 @@ function loadData() {
     const saved = localStorage.getItem('becoming_data');
     if (saved) {
       const parsed = JSON.parse(saved);
-      // Проверка версии (на будущее)
       Object.assign(userData, parsed);
-      // Очистка от битых данных
+      // Очистка от битых дат
       userData.dailyWords = userData.dailyWords.filter(w => 
         w.date && !isNaN(new Date(w.date).getTime())
       );
     }
   } catch (e) {
     console.error("Ошибка загрузки данных:", e);
-    // Если сломано — оставляем userData по умолчанию
   }
 }
 
@@ -62,7 +60,6 @@ function saveData() {
   }
 }
 
-// Загружаем при старте
 loadData();
 
 // === Слово дня ===
@@ -121,21 +118,16 @@ function saveDream() {
   }
 }
 
-// === Просто быть (3 минуты) ===
+// === Просто быть ===
 function logSilence() {
   userData.silenceMoments.push(new Date().toISOString());
   saveData();
   showModal("🧘 Ты был. Это уже присутствие.");
 }
 
-// === Природа (звуки) ===
+// === Природа ===
 function playNature(sound) {
-  // Остановить все предыдущие звуки
-  document.querySelectorAll('audio').forEach(a => {
-    a.pause();
-    a.currentTime = 0;
-  });
-
+  document.querySelectorAll('audio').forEach(a => a.pause());
   if (!NATURE_SOUNDS[sound]) return;
 
   try {
@@ -143,8 +135,8 @@ function playNature(sound) {
     audio.loop = true;
     const playPromise = audio.play();
     if (playPromise !== undefined) {
-      playPromise.catch(error => {
-        console.warn("Автовоспроизведение заблокировано:", error);
+      playPromise.catch(e => {
+        console.warn("Автовоспроизведение заблокировано:", e);
         showModal("⚠️ Чтобы включить звук, нажми на страницу.");
       });
     }
@@ -161,7 +153,7 @@ function showMap() {
     const neg = userData.wordCounts[ax.neg] || 0;
     const pos = userData.wordCounts[ax.pos] || 0;
     const diff = pos - neg;
-    const level = Math.max(0, Math.min(20, 20 + diff)); // от 0 до 20
+    const level = Math.max(0, Math.min(20, 20 + diff));
     const bar = "🌑".repeat(20 - level) + "🌱".repeat(level);
     map += `${ax.neg.toUpperCase()} ${bar} ${ax.pos.toUpperCase()} (${diff:+d})\n`;
   });
@@ -188,8 +180,7 @@ function showGarden() {
 
 // === Прозрение ===
 function showInsight() {
-  const insight = "Ты уже не идёшь сквозь туман. Ты — свет.";
-  showModal("✨ " + insight);
+  showModal("✨ Ты уже не идёшь сквозь туман. Ты — свет.");
 }
 
 // === Погода внутри ===
@@ -214,7 +205,7 @@ function showWeather() {
   showModal(`${symbol} Сегодня в тебе: ${weather}.\n\n${advice}`);
 }
 
-// === Поддержка проекта ===
+// === Поддержка ===
 function showDonate() {
   const modal = document.createElement('div');
   modal.style.cssText = `
@@ -255,25 +246,17 @@ function showDonate() {
 function showModal(message, type = null) {
   const modal = document.getElementById('modal');
   const modalBody = document.getElementById('modal-body');
-  
-  if (!modal || !modalBody) {
-    console.error("Модальное окно не найдено в DOM");
-    return;
-  }
+  if (!modal || !modalBody) return;
 
-  // Очистка
   modalBody.innerHTML = '';
-
-  // Безопасный вывод текста
   const p = document.createElement('p');
   p.textContent = message;
   modalBody.appendChild(p);
 
-  // Кнопка
-  const button = document.createElement('button');
-  button.textContent = "Закрыть";
-  button.type = "button";
-  button.onclick = closeModal;
+  const closeBtn = document.createElement('button');
+  closeBtn.textContent = "Закрыть";
+  closeBtn.type = "button";
+  closeBtn.onclick = closeModal;
 
   if (type === "rain") {
     const pauseBtn = document.createElement('button');
@@ -284,7 +267,7 @@ function showModal(message, type = null) {
     modalBody.appendChild(document.createElement('br'));
   }
 
-  modalBody.appendChild(button);
+  modalBody.appendChild(closeBtn);
   modal.style.display = 'flex';
 }
 
@@ -297,7 +280,7 @@ function stopAudio() {
   closeModal();
 }
 
-// === Запуск приложения ===
+// === Загрузка интерфейса ===
 document.addEventListener('DOMContentLoaded', () => {
   const greeting = document.querySelector('.greeting');
   if (greeting) {

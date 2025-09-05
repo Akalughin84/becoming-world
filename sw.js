@@ -1,4 +1,5 @@
-const CACHE_NAME = 'becoming-v1';
+// sw.js — Becoming v1.2
+const CACHE_NAME = 'becoming-v1.2';
 const urlsToCache = [
   '/',
   '/index.html',

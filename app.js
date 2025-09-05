@@ -41,6 +41,9 @@ const userData = {
   }
 };
 
+// === Глобальное состояние календаря ===
+let currentCalendarDate = new Date();
+
 // === Загрузка/сохранение ===
 function loadData() {
   try {
@@ -711,12 +714,11 @@ function showAbout() {
   showModal(aboutText);
 }
 
-// === Пересмотреть день ===
+// === Пересмотреть день (по дате) ===
 function reviewDay() {
   const dateStr = prompt("Введите дату (напр. 12.05.2025):");
   if (!dateStr) return;
 
-  // Парсим дату: ДД.ММ.ГГГГ → Date
   const parts = dateStr.split('.');
   if (parts.length !== 3) {
     showModal("⚠️ Неверный формат. Используй ДД.ММ.ГГГГ");
@@ -731,53 +733,179 @@ function reviewDay() {
 
   const target = targetDate.toDateString();
 
-  // Фильтруем данные
   const journalEntries = userData.journal.filter(e => new Date(e.date).toDateString() === target);
   const dreams = userData.dreams.filter(e => new Date(e.timestamp).toDateString() === target);
-  const rituals = userData.rituals.morning.filter(r => new Date(r.date).toDateString() === target)
-    .concat(userData.rituals.evening.filter(r => new Date(r.date).toDateString() === target));
-
+  const rituals = [
+    ...userData.rituals.morning.filter(r => new Date(r.date).toDateString() === target),
+    ...userData.rituals.evening.filter(r => new Date(r.date).toDateString() === target)
+  ];
   const presence = userData.dailyPresence.includes(target);
 
-  // Формируем вывод
-  let content = `📅 День: ${day}.${month}.${year}\n\n`;
-
-  if (presence) {
-    content += "✅ Ты был. Это уже присутствие.\n\n";
-  } else {
-    content += "⚪ Ты не отмечал присутствие.\n\n";
-  }
-
+  let content = `📅 ${day}.${month}.${year}\n\n`;
+  if (presence) content += "✅ Отметил присутствие\n\n";
   if (journalEntries.length > 0) {
     content += "📖 Дневник:\n";
     journalEntries.forEach(e => {
       const time = new Date(e.date).toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
-      content += `${time}: "${e.text}"\n`;
+      content += `  ${time}: "${e.text}"\n`;
     });
     content += "\n";
   }
-
   if (dreams.length > 0) {
     content += "🌌 Сны:\n";
     dreams.forEach(d => {
       const time = new Date(d.timestamp).toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
-      content += `${time}: "${d.text}"\n`;
+      content += `  ${time}: "${d.text}"\n`;
     });
     content += "\n";
   }
-
   if (rituals.length > 0) {
     content += "🌅🌙 Ритуалы:\n";
     rituals.forEach(r => {
       const time = new Date(r.date).toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
-      if (r.words) content += `${time} (утро): ${r.words}\n`;
-      if (r.word) content += `${time} (вечер): слово — "${r.word}", благодарность — "${r.thanks}"\n`;
+      if (r.words) content += `  ${time} (утро): ${r.words}\n`;
+      if (r.word) content += `  ${time} (вечер): "${r.word}", благодарность: "${r.thanks}"\n`;
+    });
+    content += "\n";
+  }
+  if (content === `📅 ${day}.${month}.${year}\n\n`) {
+    content += "День пуст. Но ты был — и это уже важно.";
+  }
+
+  showModal(content);
+}
+
+// === Отрисовка визуального календаря ===
+function renderCalendar() {
+  const container = document.getElementById('calendar-grid');
+  const monthYearLabel = document.getElementById('calendar-month-year');
+  if (!container || !monthYearLabel) return;
+
+  const date = currentCalendarDate;
+  const year = date.getFullYear();
+  const month = date.getMonth();
+
+  const monthNames = ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь',
+                      'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'];
+  monthYearLabel.textContent = `${monthNames[month]} ${year}`;
+
+  const firstDay = new Date(year, month, 1);
+  const startingDayOfWeek = firstDay.getDay() === 0 ? 6 : firstDay.getDay() - 1;
+
+  const lastDay = new Date(year, month + 1, 0);
+  const daysInMonth = lastDay.getDate();
+
+  container.innerHTML = '';
+
+  const dayNames = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'];
+  dayNames.forEach(name => {
+    const header = document.createElement('div');
+    header.textContent = name;
+    header.style.fontWeight = '600';
+    header.style.color = '#666';
+    header.style.textAlign = 'center';
+    container.appendChild(header);
+  });
+
+  for (let i = 0; i < startingDayOfWeek; i++) {
+    const empty = document.createElement('div');
+    empty.className = 'day empty';
+    container.appendChild(empty);
+  }
+
+  const today = new Date();
+  for (let day = 1; day <= daysInMonth; day++) {
+    const dayDate = new Date(year, month, day);
+    const dayStr = dayDate.toDateString();
+
+    const cell = document.createElement('div');
+    cell.className = 'day';
+    cell.textContent = day;
+
+    if (dayDate.toDateString() === today.toDateString()) {
+      cell.classList.add('today');
+    }
+
+    const hasJournal = userData.journal.some(e => new Date(e.date).toDateString() === dayStr);
+    const hasDream = userData.dreams.some(e => new Date(e.timestamp).toDateString() === dayStr);
+    const hasMorning = userData.rituals.morning.some(r => new Date(r.date).toDateString() === dayStr);
+    const hasEvening = userData.rituals.evening.some(r => new Date(r.date).toDateString() === dayStr);
+    const hasPresence = userData.dailyPresence.includes(dayStr);
+    const hasSilence = userData.silenceMoments.some(t => new Date(t).toDateString() === dayStr);
+
+    if (hasJournal) cell.classList.add('has-journal');
+    if (hasDream) cell.classList.add('has-dream');
+    if (hasMorning || hasEvening) cell.classList.add('has-ritual');
+    if (hasPresence) cell.classList.add('has-presence');
+    if (hasSilence) cell.classList.add('has-silence');
+
+    cell.style.cursor = 'pointer';
+    cell.title = 'Посмотреть день';
+    cell.addEventListener('click', () => {
+      const formatted = `${day.toString().padStart(2, '0')}.${(month + 1).toString().padStart(2, '0')}.${year}`;
+      reviewDayFromCalendar(formatted);
+    });
+
+    container.appendChild(cell);
+  }
+}
+
+// === Смена месяца ===
+function changeMonth(delta) {
+  currentCalendarDate.setMonth(currentCalendarDate.getMonth() + delta);
+  renderCalendar();
+}
+
+// === Просмотр дня (из календаря) ===
+function reviewDayFromCalendar(dateStr) {
+  const parts = dateStr.split('.');
+  const [day, month, year] = parts.map(Number);
+  const targetDate = new Date(year, month - 1, day);
+  const target = targetDate.toDateString();
+
+  let content = `📅 ${day}.${month}.${year}\n\n`;
+
+  const presence = userData.dailyPresence.includes(target);
+  if (presence) {
+    content += "✅ Отметил присутствие\n\n";
+  }
+
+  const journal = userData.journal.filter(e => new Date(e.date).toDateString() === target);
+  if (journal.length > 0) {
+    content += "📖 Дневник:\n";
+    journal.forEach(e => {
+      const time = new Date(e.date).toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
+      content += `  ${time}: "${e.text}"\n`;
     });
     content += "\n";
   }
 
-  if (content === `📅 День: ${day}.${month}.${year}\n\n`) {
-    content += "Пока пусто. Но ты был — и это уже важно.";
+  const dreams = userData.dreams.filter(e => new Date(e.timestamp).toDateString() === target);
+  if (dreams.length > 0) {
+    content += "🌌 Сны:\n";
+    dreams.forEach(d => {
+      const time = new Date(d.timestamp).toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
+      content += `  ${time}: "${d.text}"\n`;
+    });
+    content += "\n";
+  }
+
+  const rituals = [
+    ...userData.rituals.morning.filter(r => new Date(r.date).toDateString() === target),
+    ...userData.rituals.evening.filter(r => new Date(r.date).toDateString() === target)
+  ];
+  if (rituals.length > 0) {
+    content += "🌅🌙 Ритуалы:\n";
+    rituals.forEach(r => {
+      const time = new Date(r.date).toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
+      if (r.words) content += `  ${time} (утро): ${r.words}\n`;
+      if (r.word) content += `  ${time} (вечер): "${r.word}", благодарность: "${r.thanks}"\n`;
+    });
+    content += "\n";
+  }
+
+  if (content === `📅 ${day}.${month}.${year}\n\n`) {
+    content += "День пуст. Но ты был — и это уже важно.";
   }
 
   showModal(content);
@@ -807,5 +935,5 @@ document.addEventListener('DOMContentLoaded', () => {
   document.body.classList.toggle('dark', shouldAutoDark);
 
   updateUI();
+  renderCalendar(); // Запуск календаря
 });
-

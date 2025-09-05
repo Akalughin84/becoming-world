@@ -711,6 +711,78 @@ function showAbout() {
   showModal(aboutText);
 }
 
+// === Пересмотреть день ===
+function reviewDay() {
+  const dateStr = prompt("Введите дату (напр. 12.05.2025):");
+  if (!dateStr) return;
+
+  // Парсим дату: ДД.ММ.ГГГГ → Date
+  const parts = dateStr.split('.');
+  if (parts.length !== 3) {
+    showModal("⚠️ Неверный формат. Используй ДД.ММ.ГГГГ");
+    return;
+  }
+  const [day, month, year] = parts.map(Number);
+  const targetDate = new Date(year, month - 1, day);
+  if (isNaN(targetDate.getTime())) {
+    showModal("⚠️ Неверная дата.");
+    return;
+  }
+
+  const target = targetDate.toDateString();
+
+  // Фильтруем данные
+  const journalEntries = userData.journal.filter(e => new Date(e.date).toDateString() === target);
+  const dreams = userData.dreams.filter(e => new Date(e.timestamp).toDateString() === target);
+  const rituals = userData.rituals.morning.filter(r => new Date(r.date).toDateString() === target)
+    .concat(userData.rituals.evening.filter(r => new Date(r.date).toDateString() === target));
+
+  const presence = userData.dailyPresence.includes(target);
+
+  // Формируем вывод
+  let content = `📅 День: ${day}.${month}.${year}\n\n`;
+
+  if (presence) {
+    content += "✅ Ты был. Это уже присутствие.\n\n";
+  } else {
+    content += "⚪ Ты не отмечал присутствие.\n\n";
+  }
+
+  if (journalEntries.length > 0) {
+    content += "📖 Дневник:\n";
+    journalEntries.forEach(e => {
+      const time = new Date(e.date).toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
+      content += `${time}: "${e.text}"\n`;
+    });
+    content += "\n";
+  }
+
+  if (dreams.length > 0) {
+    content += "🌌 Сны:\n";
+    dreams.forEach(d => {
+      const time = new Date(d.timestamp).toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
+      content += `${time}: "${d.text}"\n`;
+    });
+    content += "\n";
+  }
+
+  if (rituals.length > 0) {
+    content += "🌅🌙 Ритуалы:\n";
+    rituals.forEach(r => {
+      const time = new Date(r.date).toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
+      if (r.words) content += `${time} (утро): ${r.words}\n`;
+      if (r.word) content += `${time} (вечер): слово — "${r.word}", благодарность — "${r.thanks}"\n`;
+    });
+    content += "\n";
+  }
+
+  if (content === `📅 День: ${day}.${month}.${year}\n\n`) {
+    content += "Пока пусто. Но ты был — и это уже важно.";
+  }
+
+  showModal(content);
+}
+
 // === Загрузка интерфейса ===
 document.addEventListener('DOMContentLoaded', () => {
   const time = getTimeOfDay();
@@ -736,3 +808,4 @@ document.addEventListener('DOMContentLoaded', () => {
 
   updateUI();
 });
+

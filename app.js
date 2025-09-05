@@ -1,4 +1,4 @@
-// app.js — Becoming v1.2
+// app.js — Becoming v1.3 (с сохранением всех комментариев)
 // 🌱 Создано Алексей Калугин, 2025
 // Не для продуктивности. Для присутствия.
 // Ты здесь. Это уже победа.
@@ -26,7 +26,7 @@ const GROWTH_AXES = [
 
 // === Глобальные данные ===
 const userData = {
-  version: 1.2,
+  version: 1.3,
   wordCounts: {},
   dailyWords: [],
   letters: [],
@@ -236,35 +236,44 @@ function updateUI() {
   });
 }
 
-// === Карта роста ===
+// === Карта роста (персонализированная) ===
 function showMap() {
-  let map = "🗺 Визуальная карта роста\n\n";
+  let map = "🗺 Карта твоего пути\n\n";
   GROWTH_AXES.forEach(ax => {
     const neg = userData.wordCounts[ax.neg] || 0;
     const pos = userData.wordCounts[ax.pos] || 0;
     const diff = pos - neg;
-    const level = Math.max(0, Math.min(20, 20 + diff));
+    const level = Math.max(0, Math.min(20, 10 + diff));
     const bar = "🌑".repeat(20 - level) + "🌱".repeat(level);
     const sign = diff >= 0 ? '+' : '';
     map += `${ax.neg.toUpperCase()} ${bar} ${ax.pos.toUpperCase()} (${sign}${diff})\n`;
   });
   showModal(map);
-  speak("Карта роста показана.", "calm");
+  speak("Карта твоего пути показана.", "calm");
 }
 
-// === Словарь сердца ===
+// === Словарь сердца (с группировкой) ===
 function showWords() {
-  const words = Object.keys(userData.wordCounts)
-    .sort((a, b) => userData.wordCounts[b] - userData.wordCounts[a])
-    .map(w => `${w} • (${userData.wordCounts[w]})`)
+  const words = userData.wordCounts;
+  const growth = ["здесь", "связь", "покой", "вера", "дышать", "иди", "будь"];
+  const shadow = ["страх", "устал", "не знаю", "один"];
+
+  const list = Object.keys(words)
+    .sort((a, b) => words[b] - words[a])
+    .map(w => {
+      const category = growth.includes(w) ? "🌱" : shadow.includes(w) ? "🌫️" : "💭";
+      return `${category} ${w} • (${words[w]})`;
+    })
     .join('\n') || "Пока пусто";
-  showModal(`📖 Словарь твоего сердца:\n${words}`);
+
+  showModal(`📖 Словарь твоего сердца:\n${list}`);
   speak("Словарь сердца показан.", "calm");
 }
 
-// === Сад ===
+// === Сад (растёт от слов присутствия) ===
 function showGarden() {
-  const hereCount = userData.dailyPresence.length;
+  const presenceWords = ["здесь", "сейчас", "есть", "чувствую", "помню", "вижу"];
+  const hereCount = presenceWords.reduce((sum, w) => sum + (userData.wordCounts[w] || 0), 0);
   const flowers = "🌼".repeat(Math.max(1, Math.floor(hereCount / 3)));
   const message = hereCount < 3
     ? "Семя ещё в земле. Оно растёт."
@@ -273,30 +282,54 @@ function showGarden() {
   speak("Твой внутренний сад показан.", "calm");
 }
 
-// === Прозрение ===
+// === Прозрение (персонализированное) ===
 function showInsight() {
-  const insight = "Ты уже не идёшь сквозь туман. Ты — свет.";
+  const words = userData.wordCounts;
+  const dreams = userData.dreams.length;
+  const letters = userData.letters.length;
+
+  let insight = "Ты уже не идёшь сквозь туман. Ты — свет.";
+
+  if (words["здесь"] > 5) {
+    insight = "Ты уже не ищешь. Ты — здесь.";
+  } else if (words["покой"] > 3) {
+    insight = "Ты больше не бежишь. Ты — покой.";
+  } else if (dreams > 2) {
+    insight = `Ты не просто спишь. Ты помнишь сны — ${dreams} раза.`;
+  } else if (letters > 1) {
+    insight = "Ты пишешь себе. Это редкость. Ты — свой друг.";
+  } else if (words["страх"] && words["вера"] && words["вера"] > words["страх"]) {
+    insight = "Ты уже не боишься. Ты веришь — чаще, чем боишься.";
+  }
+
   showModal(`✨ ${insight}`);
   speak(insight, "calm");
 }
 
-// === Погода внутри ===
+// === Погода внутри (на основе баланса слов) ===
 function showWeather() {
-  const totalWords = Object.values(userData.wordCounts).reduce((a, b) => a + b, 0);
+  const words = userData.wordCounts;
+  const light = (words["здесь"] || 0) + (words["покой"] || 0) + (words["связь"] || 0);
+  const shadow = (words["страх"] || 0) + (words["устал"] || 0) + (words["не знаю"] || 0);
+  const silence = (words["тишина"] || 0) + (words["сон"] || 0);
+
   let weather, symbol, advice;
 
-  if (totalWords > 20) {
-    weather = "лето присутствия"; symbol = "☀️";
-    advice = "Ты здесь. Это уже свет.";
-  } else if (totalWords > 10) {
-    weather = "весна пробуждения"; symbol = "🌱";
-    advice = "Ты снова растёшь. Пусть слова будут семенами.";
-  } else if (totalWords > 3) {
-    weather = "осень тишины"; symbol = "🍂";
-    advice = "Ты собираешь то, что выросло. Не торопись.";
+  if (light > shadow * 2) {
+    weather = "ясно"; symbol = "☀️";
+    advice = "Ты светишь. Это уже погода.";
+  } else if (light > shadow) {
+    weather = "переменно"; symbol = "🌤️";
+    advice = "Ты уже не в тумане. Ты — в движении.";
+  } else if (shadow > light) {
+    weather = "буря"; symbol = "⛈️";
+    advice = "Ты в буре. Но ты — не она. Ты — тот, кто чувствует.";
+  } else if (silence > 3) {
+    weather = "туман"; symbol = "🌫️";
+    advice = "Ты молчишь. Это не пустота. Это наполнение.";
   } else {
-    weather = "зима корней"; symbol = "❄️";
-    advice = "Ты не растёшь. Ты — основа.";
+    weather = "корни"; symbol = "🌱";
+    advice = "Ты не растёшь. Ты — корни. Это важно.";
   }
 
   const message = `${symbol} Сегодня в тебе: ${weather}. ${advice}`;
@@ -608,7 +641,15 @@ document.addEventListener('DOMContentLoaded', () => {
   const word = getDailyWord();
   const greeting = document.querySelector('.greeting');
   if (greeting) {
-    greeting.innerHTML = `${time.emoji} ${time.name}<br>Ты здесь. Это уже победа.<br><span class="daily-word">🌱 Слово дня: ${word}</span>`;
+    const recentWords = Object.keys(userData.wordCounts)
+      .filter(w => userData.wordCounts[w] > 0)
+      .sort((a, b) => userData.wordCounts[b] - userData.wordCounts[a])
+      .slice(0, 2)
+      .join(", ");
+
+    const personal = recentWords ? `Сегодня ты сказал: ${recentWords}.` : "Ты здесь. Это уже победа.";
+
+    greeting.innerHTML = `${time.emoji} ${time.name}<br>Ты здесь. Это уже победа.<br><span class="daily-word">🌱 Слово дня: ${word}</span><br><small>${personal}</small>`;
     speak(`${time.name}. Ты здесь. Это уже победа. Слово дня: ${word}`, "soft");
   }
 

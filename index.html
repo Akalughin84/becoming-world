@@ -50,11 +50,16 @@
       </div>
     </section>
 
-    <!-- 🔍 Пересмотреть день -->
+    <!-- 📅 Визуальный календарь -->
     <section class="menu-section">
-      <h2 class="menu-title">🔍 Пересмотреть день</h2>
-      <div class="menu-buttons">
-        <button type="button" onclick="reviewDay()">📅 Выбрать дату</button>
+      <h2 class="menu-title">📅 Календарь</h2>
+      <div class="calendar-controls">
+        <button type="button" onclick="changeMonth(-1)">◀️</button>
+        <span id="calendar-month-year">Загрузка...</span>
+        <button type="button" onclick="changeMonth(1)">▶️</button>
+      </div>
+      <div id="calendar-grid" class="calendar-grid">
+        <!-- Дни месяца будут здесь -->
       </div>
     </section>
 
@@ -128,4 +133,5 @@
   <script src="app.js"></script>
 </body>
 </html>
+
 

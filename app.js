@@ -1,4 +1,4 @@
-// app.js — Becoming v1.3 (с сохранением всех комментариев)
+// app.js — Becoming v1.3
 // 🌱 Создано Алексей Калугин, 2025
 // Не для продуктивности. Для присутствия.
 // Ты здесь. Это уже победа.
@@ -172,13 +172,76 @@ function saveDream() {
   }
 }
 
-// === Просто быть ===
+// === Перечитать сны ===
+function readDreams() {
+  if (userData.dreams.length === 0) {
+    showModal("🌌 Пока нет записанных снов.");
+    return;
+  }
+
+  const list = userData.dreams
+    .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
+    .map(dream => {
+      const date = new Date(dream.timestamp).toLocaleDateString('ru-RU', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+      return `${date}:\n"${dream.text}"`;
+    })
+    .join("\n\n");
+
+  showModal(`🌌 Твои сны:\n\n${list}`);
+}
+
+// === Просто быть (с ритуалом тишины) ===
 function logSilence() {
+  if (window.silenceTimer) {
+    showModal("🕯 Тишина уже идёт. Заверши её перед началом новой.");
+    return;
+  }
+
   userData.silenceMoments.push(new Date().toISOString());
   logWord("покой");
   saveData();
-  showModal("🧘 Ты был. Это уже присутствие.");
-  speak("Ты был. Это уже присутствие.", "soft");
+
+  showModal("🕯 Ритуал тишины начался.\n3 минуты для тебя.", "silence");
+
+  if (!currentAudio) {
+    playNature('rain');
+  }
+
+  window.silenceTimer = setTimeout(() => {
+    delete window.silenceTimer;
+    showModal("🕯 Ты был. Это уже победа.\nТы не делал. Ты просто был.");
+    speak("Ты был. Это уже победа.", "soft");
+
+    setTimeout(() => {
+      try {
+        const bell = new Audio('sounds/bell.mp3');
+        bell.volume = 0.4;
+        bell.play().catch(() => {});
+      } catch (e) {
+        console.warn("Не удалось воспроизвести звон.");
+      }
+    }, 2000);
+  }, 3 * 60 * 1000);
+}
+
+// === Прервать тишину ===
+function cancelSilence() {
+  if (!window.silenceTimer) {
+    showModal("🕯 Тишина не идёт.");
+    return;
+  }
+
+  clearTimeout(window.silenceTimer);
+  delete window.silenceTimer;
+
+  showModal("🕯 Ты вышел из тишины. Это тоже выбор.");
+  speak("Ты вышел из тишины. Это тоже выбор.", "soft");
 }
 
 // === Природа ===
@@ -400,10 +463,13 @@ function showModal(message, type = null) {
     </button>
   `;
 
-  if (type === "rain") {
+  if (type === "rain" || type === "silence") {
     buttons = `
       <button class="pause-audio" style="background: #f44336; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer;">
         ⏸️ Пауза
+      </button>
+      <button class="cancel-silence" style="background: #ff9800; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer;">
+        🛑 Прервать
       </button>
       <button class="close-modal" style="background: #333; color: #ccc; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer;">
         Закрыть
@@ -431,6 +497,16 @@ function showModal(message, type = null) {
   if (type === "rain") {
     modal.querySelector('.pause-audio').addEventListener('click', () => {
       pauseNature();
+      closeModal();
+    });
+  }
+
+  if (type === "silence") {
+    modal.querySelector('.pause-audio').addEventListener('click', () => {
+      pauseNature();
+    });
+    modal.querySelector('.cancel-silence').addEventListener('click', () => {
+      cancelSilence();
       closeModal();
     });
   }
@@ -635,30 +711,6 @@ function showAbout() {
   showModal(aboutText);
 }
 
-// === Перечитать сны ===
-function readDreams() {
-  if (userData.dreams.length === 0) {
-    showModal("🌌 Пока нет записанных снов.");
-    return;
-  }
-
-  const list = userData.dreams
-    .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
-    .map(dream => {
-      const date = new Date(dream.timestamp).toLocaleDateString('ru-RU', {
-        year: 'numeric',
-        month: 'short',
-        day: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit'
-      });
-      return `${date}:\n"${dream.text}"`;
-    })
-    .join("\n\n");
-
-  showModal(`🌌 Твои сны:\n\n${list}`);
-}
-
 // === Загрузка интерфейса ===
 document.addEventListener('DOMContentLoaded', () => {
   const time = getTimeOfDay();
@@ -684,4 +736,3 @@ document.addEventListener('DOMContentLoaded', () => {
 
   updateUI();
 });
-

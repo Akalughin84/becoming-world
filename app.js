@@ -24,13 +24,6 @@ const GROWTH_AXES = [
   { neg: "страх", pos: "вера", label: "Смелость" }
 ];
 
-// === Лимиты хранилища ===
-const LIMITS = {
-  letters: 20,
-  dreams: 30,
-  forgiveness: 20
-};
-
 // === Глобальные данные ===
 const userData = {
   version: 1,
@@ -42,6 +35,13 @@ const userData = {
   silenceMoments: [],
   visitsByTime: { morning: 0, day: 0, evening: 0, night: 0 },
   lastVisit: null
+};
+
+// === Лимиты хранилища ===
+const LIMITS = {
+  letters: 20,
+  dreams: 30,
+  forgiveness: 20
 };
 
 // === Загрузка/сохранение ===
@@ -150,18 +150,6 @@ function writeLetter() {
   }
 }
 
-function viewLetters() {
-  if (userData.letters.length === 0) {
-    showModal("📬 У тебя пока нет писем.");
-    return;
-  }
-  const list = userData.letters.map(l => {
-    const date = new Date(l.timestamp).toLocaleDateString('ru-RU');
-    return `✉️ ${date}\n"${l.content}"`;
-  }).join("\n\n");
-  showModal(`📬 Твои письма:\n${list}`);
-}
-
 // === Письмо прощению ===
 function showForgiveness() {
   const recipient = prompt("Кому ты хочешь простить? (например: себе, маме)") || "тому, кто ждал";
@@ -179,18 +167,6 @@ function showForgiveness() {
   }
 }
 
-function viewForgiveness() {
-  if (userData.forgiveness.length === 0) {
-    showModal("📬 Писем прощения пока нет.");
-    return;
-  }
-  const list = userData.forgiveness.map(f => {
-    const date = new Date(f.date).toLocaleDateString('ru-RU');
-    return `📬 ${f.recipient}, ${date}\n"${f.text}"`;
-  }).join("\n\n");
-  showModal(`📬 Письма прощения:\n${list}`);
-}
-
 // === Запись сна ===
 function saveDream() {
   const dream = prompt("Расскажи сон:");
@@ -204,18 +180,6 @@ function saveDream() {
     showModal("🌌 Сон сохранён.");
     speak("Сон сохранён. Я помню.", "soft");
   }
-}
-
-function viewDreams() {
-  if (userData.dreams.length === 0) {
-    showModal("🌌 Снов пока не записано.");
-    return;
-  }
-  const list = userData.dreams.map(d => {
-    const date = new Date(d.timestamp).toLocaleDateString('ru-RU');
-    return `🌌 ${date}\n"${d.text}"`;
-  }).join("\n\n");
-  showModal(`🌌 Твои сны:\n${list}`);
 }
 
 // === Просто быть ===
@@ -447,47 +411,6 @@ function showModal(message, type = null) {
       closeModal();
     });
   }
-}
-
-// === Экспорт данных ===
-function exportData() {
-  const dataStr = "text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(userData, null, 2));
-  const a = document.createElement('a');
-  a.href = dataStr;
-  a.download = `becoming-backup-${new Date().toISOString().slice(0, 10)}.json`;
-  a.click();
-}
-
-// === Импорт данных ===
-function importData() {
-  const input = document.createElement('input');
-  input.type = 'file';
-  input.accept = '.json';
-  input.onchange = e => {
-    const file = e.target.files[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = event => {
-      try {
-        const imported = JSON.parse(event.target.result);
-        Object.assign(userData, imported);
-        limitArrays();
-        saveData();
-        showModal("✅ Данные восстановлены.");
-      } catch (err) {
-        showModal("⚠️ Ошибка чтения файла.");
-      }
-    };
-    reader.readAsText(file);
-  };
-  input.click();
-}
-
-// === Тема (тёмный режим) ===
-function toggleTheme() {
-  document.body.classList.toggle('dark');
-  const isDark = document.body.classList.contains('dark');
-  localStorage.setItem('theme', isDark ? 'dark' : 'light');
 }
 
 // === Вспомогательные функции ===

@@ -635,6 +635,30 @@ function showAbout() {
   showModal(aboutText);
 }
 
+// === Перечитать сны ===
+function readDreams() {
+  if (userData.dreams.length === 0) {
+    showModal("🌌 Пока нет записанных снов.");
+    return;
+  }
+
+  const list = userData.dreams
+    .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
+    .map(dream => {
+      const date = new Date(dream.timestamp).toLocaleDateString('ru-RU', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+      return `${date}:\n"${dream.text}"`;
+    })
+    .join("\n\n");
+
+  showModal(`🌌 Твои сны:\n\n${list}`);
+}
+
 // === Загрузка интерфейса ===
 document.addEventListener('DOMContentLoaded', () => {
   const time = getTimeOfDay();
@@ -660,3 +684,4 @@ document.addEventListener('DOMContentLoaded', () => {
 
   updateUI();
 });
+

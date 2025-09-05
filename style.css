@@ -59,9 +59,11 @@ body.dark .greeting {
   font-weight: 600;
   color: #2c7a2c;
 }
+
 /* === Секции меню === */
 .menu-section {
   margin: 24px 0;
+  text-align: left;
 }
 .menu-title {
   font-size: 0.9rem;
@@ -70,16 +72,11 @@ body.dark .greeting {
   letter-spacing: 1px;
   margin-bottom: 12px;
   font-weight: 600;
-  text-align: left;
 }
 body.dark .menu-title {
   color: #999;
 }
-.menu-buttons {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 12px;
-}
+
 /* === Кнопки === */
 button {
   background: #f1f3f5;
@@ -111,6 +108,7 @@ body.dark button:hover {
 button:active {
   transform: translateY(0);
 }
+
 /* === Кнопка "поддержать" === */
 .small {
   font-size: 0.9rem;
@@ -132,6 +130,7 @@ body.dark .small {
 body.dark .small:hover {
   color: #88f088;
 }
+
 /* === Подвал === */
 .footer {
   margin-top: 32px;
@@ -150,11 +149,47 @@ body.dark .footer {
 body.dark .footer small {
   color: #777;
 }
+
+/* === Карта года === */
+#year-map {
+  font-family: monospace;
+  font-size: 1.2em;
+  line-height: 1.2;
+  text-align: left;
+  margin-top: 8px;
+}
+.legend {
+  font-size: 0.8em;
+  color: #777;
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+body.dark .legend {
+  color: #999;
+}
+.month {
+  font-weight: bold;
+  margin-bottom: 4px;
+}
+.calendar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+.day {
+  transition: transform 0.1s;
+}
+.day:hover {
+  transform: scale(1.2);
+}
+
 /* === Анимации === */
 @keyframes fadeIn {
   from { opacity: 0; transform: scale(0.9); }
   to { opacity: 1; transform: scale(1); }
 }
+
 /* === Адаптивность === */
 @media (max-width: 480px) {
   .container {

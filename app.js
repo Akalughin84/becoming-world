@@ -5,8 +5,8 @@
 
 // === Константы ===
 const DONATE = {
-  boosty: "https://boosty.to/becoming", // исправлено: убраны пробелы
-  kofi: "https://ko-fi.com/becoming5036"  // исправлено: убраны пробелы
+  boosty: "https://boosty.to/becoming",
+  kofi: "https://ko-fi.com/becoming5036"
 };
 
 const NATURE_SOUNDS = {
@@ -47,7 +47,6 @@ let currentCalendarDate = new Date();
 // === Загрузка/сохранение ===
 function loadData() {
   try {
-    if (!window.localStorage) return;
     const saved = localStorage.getItem('becoming_data');
     if (saved) {
       const parsed = JSON.parse(saved);
@@ -63,11 +62,10 @@ function loadData() {
 
 function saveData() {
   try {
-    if (!window.localStorage) return;
     localStorage.setItem('becoming_data', JSON.stringify(userData));
   } catch (e) {
-    if (e.name === 'QuotaExceededError' || e.name === 'SecurityError') {
-      showModal("⚠️ Не удалось сохранить данные (например, приватный режим).");
+    if (e.name === 'QuotaExceededError') {
+      showModal("⚠️ Слишком много данных. Очисти старые записи.");
     } else {
       console.error("Ошибка сохранения:", e);
     }
@@ -133,7 +131,7 @@ function getDailyWord() {
 // === Письмо себе ===
 function writeLetter() {
   const text = prompt("Напиши письмо себе через год:");
-  if (text && text.trim()) { // исправлено: безопасный trim
+  if (text?.trim()) {
     userData.letters.push({
       content: text.trim(),
       timestamp: new Date().toISOString()
@@ -149,7 +147,7 @@ function writeLetter() {
 function showForgiveness() {
   const recipient = prompt("Кому ты хочешь простить? (например: себе, маме)") || "тому, кто ждал";
   const content = prompt("Напиши своё письмо:");
-  if (content && content.trim()) { // исправлено
+  if (content?.trim()) {
     userData.forgiveness.push({
       recipient: recipient.trim(),
       text: content.trim(),
@@ -165,7 +163,7 @@ function showForgiveness() {
 // === Запись сна ===
 function saveDream() {
   const dream = prompt("Расскажи сон:");
-  if (dream && dream.trim()) { // исправлено
+  if (dream?.trim()) {
     userData.dreams.push({
       text: dream.trim(),
       timestamp: new Date().toISOString()
@@ -292,9 +290,9 @@ function pauseNature() {
     currentAudio.pause();
     currentAudio = null;
     currentSound = null;
+    updateUI();
+    showModal("⏸️ Звук остановлен.");
   }
-  updateUI(); // ✅ добавлено: обновление UI
-  showModal("⏸️ Звук остановлен.");
 }
 
 function updateUI() {
@@ -450,8 +448,7 @@ function showDonate() {
 
 // === Модальное окно (динамическое) ===
 function showModal(message, type = null) {
-  // ✅ Очистка старых модалок
-  document.querySelectorAll('.becoming-modal').forEach(m => m.remove());
+  if (document.querySelector('.becoming-modal')) return;
 
   const modal = document.createElement('div');
   modal.className = 'becoming-modal';
@@ -564,8 +561,7 @@ function toggleTheme() {
 
 // === Вспомогательные функции ===
 function logWord(word) {
-  const key = word.toLowerCase().trim(); // ✅ нормализация
-  userData.wordCounts[key] = (userData.wordCounts[key] || 0) + 1;
+  userData.wordCounts[word] = (userData.wordCounts[word] || 0) + 1;
 }
 
 // === Присутствие: отметить день ===
@@ -586,7 +582,7 @@ function markPresence() {
 // === Дневник ===
 function writeJournal() {
   const entry = prompt("Запиши сегодняшнее переживание, мысль, чувства:");
-  if (entry && entry.trim()) { // исправлено
+  if (entry?.trim()) {
     userData.journal.push({
       text: entry.trim(),
       date: new Date().toISOString()
@@ -614,7 +610,7 @@ function readJournal() {
 // === Утренний ритуал ===
 function morningRitual() {
   const words = prompt("Три слова, с которыми ты начинаешь день:");
-  if (words && words.trim()) { // исправлено
+  if (words?.trim()) {
     userData.rituals.morning.push({
       words: words.trim(),
       date: new Date().toISOString()
@@ -630,7 +626,7 @@ function morningRitual() {
 function eveningRitual() {
   const word = prompt("Какое слово сегодняшнего вечера?");
   const thanks = prompt("За что ты благодарен сегодня?");
-  if ((word && word.trim()) || (thanks && thanks.trim())) {
+  if (word?.trim() || thanks?.trim()) {
     userData.rituals.evening.push({
       word: word?.trim() || "—",
       thanks: thanks?.trim() || "—",
@@ -645,7 +641,7 @@ function eveningRitual() {
 
 // === Обновление UI ===
 function updateUI() {
-  renderMonthMap(); // ✅ переименовано
+  renderYearMap();
   const count = userData.dailyPresence.length;
   const counter = document.getElementById('presence-count');
   if (counter) counter.textContent = count;
@@ -658,8 +654,8 @@ function updateUI() {
   }
 }
 
-// === Карта месяца ===
-function renderMonthMap() { // ✅ переименовано
+// === Карта года ===
+function renderYearMap() {
   const container = document.getElementById('year-map');
   if (!container) return;
 
@@ -729,10 +725,6 @@ function reviewDay() {
     return;
   }
   const [day, month, year] = parts.map(Number);
-  if (month < 1 || month > 12 || day < 1 || day > 31 || year < 1900 || year > 2100) {
-    showModal("⚠️ Неверная дата.");
-    return;
-  }
   const targetDate = new Date(year, month - 1, day);
   if (isNaN(targetDate.getTime())) {
     showModal("⚠️ Неверная дата.");
@@ -740,38 +732,25 @@ function reviewDay() {
   }
 
   const target = targetDate.toDateString();
-  renderDaySummary(target, day, month, year);
-}
 
-// === Просмотр дня (из календаря) ===
-function reviewDayFromCalendar(dateStr) {
-  const parts = dateStr.split('.');
-  const [day, month, year] = parts.map(Number);
-  const targetDate = new Date(year, month - 1, day);
-  const target = targetDate.toDateString();
-  renderDaySummary(target, day, month, year);
-}
-
-// === Общая функция для отображения дня ===
-function renderDaySummary(target, day, month, year) {
-  let content = `📅 ${day}.${month}.${year}\n\n`;
-
+  const journalEntries = userData.journal.filter(e => new Date(e.date).toDateString() === target);
+  const dreams = userData.dreams.filter(e => new Date(e.timestamp).toDateString() === target);
+  const rituals = [
+    ...userData.rituals.morning.filter(r => new Date(r.date).toDateString() === target),
+    ...userData.rituals.evening.filter(r => new Date(r.date).toDateString() === target)
+  ];
   const presence = userData.dailyPresence.includes(target);
-  if (presence) {
-    content += "✅ Отметил присутствие\n\n";
-  }
 
-  const journal = userData.journal.filter(e => new Date(e.date).toDateString() === target);
-  if (journal.length > 0) {
+  let content = `📅 ${day}.${month}.${year}\n\n`;
+  if (presence) content += "✅ Отметил присутствие\n\n";
+  if (journalEntries.length > 0) {
     content += "📖 Дневник:\n";
-    journal.forEach(e => {
+    journalEntries.forEach(e => {
       const time = new Date(e.date).toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
       content += `  ${time}: "${e.text}"\n`;
     });
     content += "\n";
   }
-
-  const dreams = userData.dreams.filter(e => new Date(e.timestamp).toDateString() === target);
   if (dreams.length > 0) {
     content += "🌌 Сны:\n";
     dreams.forEach(d => {
@@ -780,11 +759,6 @@ function renderDaySummary(target, day, month, year) {
     });
     content += "\n";
   }
-
-  const rituals = [
-    ...userData.rituals.morning.filter(r => new Date(r.date).toDateString() === target),
-    ...userData.rituals.evening.filter(r => new Date(r.date).toDateString() === target)
-  ];
   if (rituals.length > 0) {
     content += "🌅🌙 Ритуалы:\n";
     rituals.forEach(r => {
@@ -794,7 +768,6 @@ function renderDaySummary(target, day, month, year) {
     });
     content += "\n";
   }
-
   if (content === `📅 ${day}.${month}.${year}\n\n`) {
     content += "День пуст. Но ты был — и это уже важно.";
   }
@@ -883,6 +856,61 @@ function changeMonth(delta) {
   renderCalendar();
 }
 
+// === Просмотр дня (из календаря) ===
+function reviewDayFromCalendar(dateStr) {
+  const parts = dateStr.split('.');
+  const [day, month, year] = parts.map(Number);
+  const targetDate = new Date(year, month - 1, day);
+  const target = targetDate.toDateString();
+
+  let content = `📅 ${day}.${month}.${year}\n\n`;
+
+  const presence = userData.dailyPresence.includes(target);
+  if (presence) {
+    content += "✅ Отметил присутствие\n\n";
+  }
+
+  const journal = userData.journal.filter(e => new Date(e.date).toDateString() === target);
+  if (journal.length > 0) {
+    content += "📖 Дневник:\n";
+    journal.forEach(e => {
+      const time = new Date(e.date).toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
+      content += `  ${time}: "${e.text}"\n`;
+    });
+    content += "\n";
+  }
+
+  const dreams = userData.dreams.filter(e => new Date(e.timestamp).toDateString() === target);
+  if (dreams.length > 0) {
+    content += "🌌 Сны:\n";
+    dreams.forEach(d => {
+      const time = new Date(d.timestamp).toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
+      content += `  ${time}: "${d.text}"\n`;
+    });
+    content += "\n";
+  }
+
+  const rituals = [
+    ...userData.rituals.morning.filter(r => new Date(r.date).toDateString() === target),
+    ...userData.rituals.evening.filter(r => new Date(r.date).toDateString() === target)
+  ];
+  if (rituals.length > 0) {
+    content += "🌅🌙 Ритуалы:\n";
+    rituals.forEach(r => {
+      const time = new Date(r.date).toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
+      if (r.words) content += `  ${time} (утро): ${r.words}\n`;
+      if (r.word) content += `  ${time} (вечер): "${r.word}", благодарность: "${r.thanks}"\n`;
+    });
+    content += "\n";
+  }
+
+  if (content === `📅 ${day}.${month}.${year}\n\n`) {
+    content += "День пуст. Но ты был — и это уже важно.";
+  }
+
+  showModal(content);
+}
+
 // === Загрузка интерфейса ===
 document.addEventListener('DOMContentLoaded', () => {
   const time = getTimeOfDay();
@@ -903,9 +931,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const savedTheme = localStorage.getItem('theme');
   const isNight = time.key === 'night' || time.key === 'evening';
-  const shouldAutoDark = savedTheme === 'dark' || (!savedTheme && isNight));
+  const shouldAutoDark = savedTheme === 'dark' || (!savedTheme && isNight);
   document.body.classList.toggle('dark', shouldAutoDark);
 
   updateUI();
-  renderCalendar();
+  renderCalendar(); // Запуск календаря
 });

@@ -33,15 +33,12 @@ const userData = {
   dreams: [],
   forgiveness: [],
   silenceMoments: [],
-  visitsByTime: { morning: 0, day: 0, evening: 0, night: 0 },
-  lastVisit: null
-};
-
-// === Лимиты хранилища ===
-const LIMITS = {
-  letters: 20,
-  dreams: 30,
-  forgiveness: 20
+  dailyPresence: [], // даты, когда отметил "здесь"
+  journal: [], // дневник
+  rituals: {
+    morning: [],
+    evening: []
+  }
 };
 
 // === Загрузка/сохранение ===
@@ -54,7 +51,6 @@ function loadData() {
       userData.dailyWords = userData.dailyWords.filter(w =>
         w.date && !isNaN(new Date(w.date).getTime())
       );
-      limitArrays();
     }
   } catch (e) {
     console.error("Ошибка загрузки данных:", e);
@@ -71,12 +67,6 @@ function saveData() {
       console.error("Ошибка сохранения:", e);
     }
   }
-}
-
-function limitArrays() {
-  userData.letters = userData.letters.slice(-LIMITS.letters);
-  userData.dreams = userData.dreams.slice(-LIMITS.dreams);
-  userData.forgiveness = userData.forgiveness.slice(-LIMITS.forgiveness);
 }
 
 loadData();
@@ -274,7 +264,7 @@ function showWords() {
 
 // === Сад ===
 function showGarden() {
-  const hereCount = userData.wordCounts["здесь"] || 0;
+  const hereCount = userData.dailyPresence.length;
   const flowers = "🌼".repeat(Math.max(1, Math.floor(hereCount / 3)));
   const message = hereCount < 3
     ? "Семя ещё в земле. Оно растёт."
@@ -413,31 +403,191 @@ function showModal(message, type = null) {
   }
 }
 
+// === Экспорт данных (закомментирован) ===
+/*
+function exportData() {
+  const dataStr = "text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(userData, null, 2));
+  const a = document.createElement('a');
+  a.href = dataStr;
+  a.download = `becoming-backup-${new Date().toISOString().slice(0, 10)}.json`;
+  a.click();
+}
+*/
+
+// === Импорт данных (закомментирован) ===
+/*
+function importData() {
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = '.json';
+  input.onchange = e => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = event => {
+      try {
+        const imported = JSON.parse(event.target.result);
+        Object.assign(userData, imported);
+        saveData();
+        showModal("✅ Данные восстановлены.");
+      } catch (err) {
+        showModal("⚠️ Ошибка чтения файла.");
+      }
+    };
+    reader.readAsText(file);
+  };
+  input.click();
+}
+*/
+
+// === Тема (тёмный режим) ===
+function toggleTheme() {
+  document.body.classList.toggle('dark');
+  const isDark = document.body.classList.contains('dark');
+  localStorage.setItem('theme', isDark ? 'dark' : 'light');
+}
+
 // === Вспомогательные функции ===
 function logWord(word) {
   userData.wordCounts[word] = (userData.wordCounts[word] || 0) + 1;
 }
 
+// === Присутствие: отметить день ===
+function markPresence() {
+  const today = new Date().toDateString();
+  if (!userData.dailyPresence.includes(today)) {
+    userData.dailyPresence.push(today);
+    logWord("здесь");
+    saveData();
+    showModal("✅ Ты был. Это уже присутствие.");
+    speak("Ты был. Это уже присутствие.", "soft");
+    updateUI();
+  } else {
+    showModal("🌱 Ты уже отметил это присутствие.");
+  }
+}
+
+// === Дневник ===
+function writeJournal() {
+  const entry = prompt("Запиши сегодняшнее переживание, мысль, чувства:");
+  if (entry?.trim()) {
+    userData.journal.push({
+      text: entry.trim(),
+      date: new Date().toISOString()
+    });
+    saveData();
+    showModal("📖 Запись добавлена в дневник.");
+    speak("Запись добавлена.", "soft");
+  }
+}
+
+function readJournal() {
+  if (userData.journal.length === 0) {
+    showModal("📖 Дневник пока пуст.");
+    return;
+  }
+  const list = userData.journal
+    .sort((a, b) => new Date(b.date) - new Date(a.date))
+    .map(e => {
+      const date = new Date(e.date).toLocaleDateString('ru-RU');
+      return `${date}:\n"${e.text}"`;
+    }).join("\n\n");
+  showModal(`📖 Твой дневник:\n\n${list}`);
+}
+
+// === Утренний ритуал ===
+function morningRitual() {
+  const words = prompt("Три слова, с которыми ты начинаешь день:");
+  if (words?.trim()) {
+    userData.rituals.morning.push({
+      words: words.trim(),
+      date: new Date().toISOString()
+    });
+    words.trim().split(/\s+/).forEach(w => logWord(w));
+    saveData();
+    showModal("🌅 Утро начато. Пусть слова будут путеводными.");
+    speak("Утро начато. Пусть слова будут путеводными.", "calm");
+  }
+}
+
+// === Вечерний ритуал ===
+function eveningRitual() {
+  const word = prompt("Какое слово сегодняшнего вечера?");
+  const thanks = prompt("За что ты благодарен сегодня?");
+  if (word?.trim() || thanks?.trim()) {
+    userData.rituals.evening.push({
+      word: word?.trim() || "—",
+      thanks: thanks?.trim() || "—",
+      date: new Date().toISOString()
+    });
+    if (word) logWord(word.trim().toLowerCase());
+    saveData();
+    showModal("🌙 День завершён. Ты не просто прожил — ты был.");
+    speak("День завершён. Ты не просто прожил — ты был.", "soft");
+  }
+}
+
+// === Обновление UI ===
+function updateUI() {
+  renderYearMap();
+  const count = userData.dailyPresence.length;
+  const counter = document.getElementById('presence-count');
+  if (counter) counter.textContent = count;
+
+  const mapStatus = document.getElementById('day-map-status');
+  if (mapStatus) {
+    mapStatus.textContent = count === 0
+      ? "🗺 Карта дня: пока пуста\nОтметь момент — и она оживёт."
+      : `✅ Ты был с собой ${count} дней.\nТы здесь. Это уже начало.`;
+  }
+}
+
+// === Карта года ===
+function renderYearMap() {
+  const container = document.getElementById('year-map');
+  if (!container) return;
+
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = now.getMonth();
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+  let html = `<div class="legend">
+    <span>🟩 Присутствие</span>
+    <span>🟨 Усталость</span>
+    <span>🟥 Боль</span>
+    <span>🔵 Сон</span>
+    <span>⚪ Пропущен</span>
+  </div><br>`;
+
+  html += `<div class="month">${year}-${String(month + 1).padStart(2, '0')}:</div>`;
+  html += '<div class="calendar">';
+
+  for (let day = 1; day <= daysInMonth; day++) {
+    const date = new Date(year, month, day).toDateString();
+    const isPresent = userData.dailyPresence.includes(date);
+    const emoji = isPresent ? "🟩" : "⚪";
+    html += `<span class="day" title="${date}">${emoji}</span>`;
+  }
+
+  html += '</div>';
+  container.innerHTML = html;
+}
+
 // === Загрузка интерфейса ===
 document.addEventListener('DOMContentLoaded', () => {
-  // Применяем тему
-  const savedTheme = localStorage.getItem('theme');
   const time = getTimeOfDay();
+  const word = getDailyWord();
+  const greeting = document.querySelector('.greeting');
+  if (greeting) {
+    greeting.innerHTML = `${time.emoji} ${time.name}<br>Ты здесь. Это уже победа.<br><span class="daily-word">🌱 Слово дня: ${word}</span>`;
+    speak(`${time.name}. Ты здесь. Это уже победа. Слово дня: ${word}`, "soft");
+  }
+
+  const savedTheme = localStorage.getItem('theme');
   const isNight = time.key === 'night' || time.key === 'evening';
   const shouldAutoDark = savedTheme === 'dark' || (!savedTheme && isNight);
   document.body.classList.toggle('dark', shouldAutoDark);
 
-  // Обновляем приветствие
-  const greeting = document.querySelector('.greeting');
-  if (greeting) {
-    const word = getDailyWord();
-    const today = new Date().toDateString();
-    if (!userData.lastVisit || new Date(userData.lastVisit).toDateString() !== today) {
-      userData.visitsByTime[time.key]++;
-      userData.lastVisit = new Date().toISOString();
-      saveData();
-    }
-    greeting.innerHTML = `${time.emoji} ${time.name}<br>Ты здесь. Это уже победа.<br><span class="daily-word">🌱 Слово дня: ${word}</span>`;
-    speak(`${time.name}. Ты здесь. Это уже победа. Слово дня: ${word}`, "soft");
-  }
+  updateUI();
 });

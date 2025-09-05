@@ -19,6 +19,31 @@
     <h1>🌱 Becoming</h1>
     <p class="greeting">Загрузка...</p>
 
+    <!-- Карта дня -->
+    <section class="menu-section">
+      <h2 class="menu-title">🗺 Карта дня</h2>
+      <p id="day-map-status">Загрузка...</p>
+      <button type="button" onclick="markPresence()">✅ Отметить присутствие</button>
+    </section>
+
+    <!-- Дневник -->
+    <section class="menu-section">
+      <h2 class="menu-title">📖 Дневник</h2>
+      <div class="menu-buttons">
+        <button type="button" onclick="writeJournal()">✍️ Записать переживание</button>
+        <button type="button" onclick="readJournal()">📚 Перечитать</button>
+      </div>
+    </section>
+
+    <!-- Ритуалы -->
+    <section class="menu-section">
+      <h2 class="menu-title">🌅🌙 Ритуалы</h2>
+      <div class="menu-buttons">
+        <button type="button" onclick="morningRitual()">🌅 Утренний ритуал</button>
+        <button type="button" onclick="eveningRitual()">🌙 Вечерний ритуал</button>
+      </div>
+    </section>
+
     <!-- 1. Письма и память -->
     <section class="menu-section">
       <h2 class="menu-title">📬 Письма и память</h2>
@@ -57,6 +82,25 @@
         <button type="button" onclick="showMap()">🗺 Карта роста</button>
         <button type="button" onclick="showWords()">📖 Словарь сердца</button>
       </div>
+    </section>
+
+    <!-- 5. Инструменты -->
+    <!-- Экспорт/импорт закомментированы -->
+    <!--
+    <section class="menu-section">
+      <h2 class="menu-title">⚙️ Инструменты</h2>
+      <div class="menu-buttons">
+        <button type="button" onclick="exportData()">💾 Экспорт данных</button>
+        <button type="button" onclick="importData()">📁 Импорт данных</button>
+        <button type="button" onclick="toggleTheme()">🌙 / ☀️ Тема</button>
+      </div>
+    </section>
+    -->
+
+    <!-- Карта года -->
+    <section class="menu-section">
+      <h2 class="menu-title">📅 Карта года</h2>
+      <div id="year-map">Загрузка календаря...</div>
     </section>
 
     <!-- Подвал -->

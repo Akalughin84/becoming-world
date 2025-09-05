@@ -184,6 +184,55 @@ body.dark .legend {
   transform: scale(1.2);
 }
 
+/* === Календарь === */
+.calendar-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  font-weight: 600;
+  color: #2c7a2c;
+}
+
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+  font-size: 0.9rem;
+}
+
+.calendar-grid .day {
+  padding: 8px;
+  text-align: center;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+  background: #f8f9fa;
+  color: #444;
+}
+
+.calendar-grid .day:hover {
+  background: #e9ecef;
+  transform: scale(1.05);
+}
+
+.calendar-grid .day.today {
+  background: #2c7a2c;
+  color: white;
+  font-weight: bold;
+}
+
+.calendar-grid .day.empty {
+  visibility: hidden;
+}
+
+/* Активность */
+.calendar-grid .day.has-journal { background: #d4edda; border: 1px solid #c3e6cb; }
+.calendar-grid .day.has-dream { background: #d1ecf1; border: 1px solid #bee5eb; }
+.calendar-grid .day.has-ritual { background: #d8d8e8; border: 1px solid #c3c3dc; }
+.calendar-grid .day.has-presence { background: #fff3cd; border: 1px solid #ffeaa7; }
+.calendar-grid .day.has-silence { background: #e2e3e5; border: 1px solid #d6d8db; }
+
 /* === Анимации === */
 @keyframes fadeIn {
   from { opacity: 0; transform: scale(0.9); }
@@ -203,3 +252,4 @@ body.dark .legend {
     font-size: 1rem;
   }
 }
+

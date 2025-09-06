@@ -423,6 +423,7 @@ function updateGrowthStatus() {
   // === Прозрение ===
   const insightStatus = document.getElementById('insight-status');
   if (insightStatus) {
+    const insight = generateInsightSnippet();
     insightStatus.textContent = generateInsightSnippet();
   }
 
@@ -1124,3 +1125,4 @@ document.addEventListener('DOMContentLoaded', () => {
   updateDailyInsight();       // Обновляем прозрение
   updateGrowthStatus();
 });
+

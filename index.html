@@ -15,27 +15,50 @@
 <body>
   <!-- Главная -->
   <div id="home" class="screen active">
-    <h1>🌱 Becoming</h1>
+    <h1 class="home-title">🌱 Becoming</h1>
+    
+    <!-- Приветствие с анимацией -->
     <p class="greeting" aria-live="polite">Загрузка...</p>
-    
+
+    <!-- Основные действия -->
     <div class="home-actions">
-      <button onclick="markPresence()" class="btn-primary">✅ Я был</button>
-      <button onclick="logSilence()" class="btn-secondary">🕯 3 мин тишины</button>
+      <button onclick="markPresence()" class="btn-primary pulse-hint">
+        ✅ Я был
+      </button>
+      <button onclick="logSilence()" class="btn-secondary">
+        🕯️ 3 мин тишины
+      </button>
     </div>
-    
+
+    <!-- Подсказка-проводник -->
+    <div class="guide-box">
+      <p>
+        <strong>Ты здесь. Это уже победа.</strong><br>
+        Не нужно ничего делать. Но если хочешь — можешь:
+      </p>
+      <ul class="guide-list">
+        <li>Отметить, что <strong>ты был</strong> — это уже путь</li>
+        <li>Провести <strong>3 минуты в тишине</strong> — без смысла, без дела</li>
+        <li>Включить <strong>дождь или огонь</strong> — чтобы легче было быть</li>
+        <li>Сказать <strong>одно слово</strong> — "здесь", "дышать", "достаточно"</li>
+      </ul>
+      <p style="font-size: 0.9em; color: #888; margin-top: 12px;">
+        Это не упражнение. Это возвращение.
+      </p>
+    </div>
+
     <!-- Карта дня -->
     <div class="menu-section">
       <h3 class="menu-title">🗺 Карта дня</h3>
       <p id="day-map-status">Загрузка...</p>
-      <!--<button type="button" onclick="markPresence()" class="btn-primary">✅ Отметить присутствие</button>-->
     </div>
-    
-    <!-- 📅 Карта года -->
+
+    <!-- Карта года -->
     <section class="menu-section">
       <h2 class="menu-title">📅 Карта года</h2>
       <div id="year-map">Загрузка календаря...</div>
     </section>
-    
+
     <!-- Прозрение -->
     <div class="insight-box">
       <p id="daily-insight" aria-live="polite">Загрузка прозрения...</p>
@@ -56,65 +79,139 @@
   <!-- Память -->
   <div id="memory" class="screen">
     <h2>📬 Память</h2>
+
+    <!-- 📝 Дневник и мысли -->
+    <div class="memory-section">
+      <h3 class="memory-title">📝 Слово, которое растёт</h3>
+      <div class="menu-buttons">
+        <button onclick="writeJournal()">✍️ Новая запись</button>
+        <button onclick="readJournal()">📖 Перечитать дневник</button>
+      </div>
+    </div>
+
+    <!-- 💌 Письма себе -->
+    <div class="memory-section">
+      <h3 class="memory-title">💌 Письма себе</h3>
+      <div class="menu-buttons">
+        <button onclick="writeLetter()">✉️ Письмо себе (через год)</button>
+      </div>
+    </div>
+
+    <!-- 🙏 Благодарность и прощение -->
+    <div class="memory-section">
+      <h3 class="memory-title">🙏 Встреча с собой</h3>
+      <div class="menu-buttons">
+        <button onclick="writeGratitude()">🌱 Благодарность</button>
+        <button onclick="showForgiveness()">🕊️ Прощение</button>
+        <button onclick="writeAcknowledgment()">👁️ Признание</button>
+      </div>
+    </div>
+
+  <!-- 🌌 Сны -->
+  <div class="memory-section">
+    <h3 class="memory-title">🌌 Что помнишь из сна</h3>
     <div class="menu-buttons">
-      <button onclick="writeJournal()">✍️ Дневник</button>
-      <button onclick="writeLetter()">✉️ Письмо себе</button>
-      <button onclick="showForgiveness()">📬 Прощение</button>
-      <button onclick="saveDream()">🌌 Сон</button>
+      <button onclick="saveDream()">💭 Рассказать сон</button>
       <button onclick="readDreams()">📚 Перечитать сны</button>
-    </div>
-  </div>
-
-  <!-- Рост -->
-  <div id="growth" class="screen">
-  <h2>🌱 Внутренний ландшафт</h2>
-
-  <!-- Сад -->
-  <div class="growth-item" onclick="showGarden()">
-    <div class="growth-icon">🌷</div>
-    <div class="growth-text">
-      <h3>Твой сад</h3>
-      <p id="garden-status">Загрузка...</p>
-    </div>
-  </div>
-
-  <!-- Карта роста -->
-  <div class="growth-item" onclick="showMap()">
-    <div class="growth-icon">🗺️</div>
-    <div class="growth-text">
-      <h3>Твой путь</h3>
-      <p id="map-status">Глубина, связь, покой, вера</p>
-    </div>
-  </div>
-
-  <!-- Словарь сердца -->
-  <div class="growth-item" onclick="showWords()">
-    <div class="growth-icon">📖</div>
-    <div class="growth-text">
-      <h3>Язык сердца</h3>
-      <p id="words-status">Загрузка слов...</p>
-    </div>
-  </div>
-
-  <!-- Прозрение -->
-  <div class="growth-item" onclick="showInsight()">
-    <div class="growth-icon">✨</div>
-    <div class="growth-text">
-      <h3>Прозрение</h3>
-      <p id="insight-status">Что-то уже меняется...</p>
     </div>
   </div>
 </div>
 
-  <!-- Природа -->
-  <div id="nature" class="screen">
-    <h2>🌧️ Природа</h2>
-    <div class="menu-buttons">
-      <button onclick="playNature('rain')">🌧️ Дождь</button>
-      <button onclick="playNature('fire')">🔥 Огонь</button>
-      <button onclick="playNature('ocean')">🌊 Океан</button>
-      <button onclick="showWeather()">🌤️ Погода внутри</button>
+  <!-- Рост -->
+  <div id="growth" class="screen">
+    <h2>🌱 Внутренний ландшафт</h2>
+
+    <!-- Визуальный сад -->
+    <div class="growth-item" onclick="showGarden()">
+      <div class="growth-icon">🌷</div>
+      <div class="growth-text">
+        <h3>Твой сад</h3>
+        <p id="garden-status">Семя ещё в земле. Оно растёт.</p>
+      </div>
     </div>
+
+    <!-- SVG-сад -->
+    <div id="garden-visual" style="margin: 10px 0; text-align: center;">
+      <svg id="garden-svg" width="120" height="60" viewBox="0 0 120 60">
+        <!-- Земля -->
+        <rect x="0" y="50" width="120" height="10" fill="#5D4037" />
+        <!-- Растения будут добавляться здесь -->
+      </svg>
+    </div>
+
+    <!-- Компас роста -->
+    <div class="growth-item" onclick="showMap()">
+      <div class="growth-icon">🧭</div>
+      <div class="growth-text">
+        <h3>Твой путь</h3>
+        <p id="map-preview">Глубина, связь, покой, вера</p>
+      </div>
+    </div>
+
+    <!-- Путь за 30 дней -->
+    <div class="growth-item" onclick="showPath()">
+      <div class="growth-icon">🛤️</div>
+      <div class="growth-text">
+        <h3>Путь за 30 дней</h3>
+        <p>Как ты шёл через тишину и слова</p>
+      </div>
+    </div>
+
+    <!-- Подсказка -->
+    <div style="margin: 16px 0; padding: 12px; background: #f1f3f5; border-radius: 10px; font-size: 0.85rem; color: #555;">
+      🌱 Каждое слово, которое ты говоришь, влияет на твой путь.  
+      Карта показывает, куда тянется твой внутренний голос.
+    </div>
+
+    <!-- Язык сердца -->
+    <div class="growth-item" onclick="showWords()">
+      <div class="growth-icon">💬</div>
+      <div class="growth-text">
+        <h3>Язык сердца</h3>
+        <p id="words-status">Загрузка слов...</p>
+      </div>
+    </div>
+
+    <!-- Прозрение -->
+    <div class="growth-item" onclick="showInsight()">
+      <div class="growth-icon">✨</div>
+      <div class="growth-text">
+        <h3>Прозрение</h3>
+        <p id="insight-status">Что-то уже меняется...</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Погружение -->
+  <div id="nature" class="screen">
+    <h2>🌊 Погружение</h2>
+    <p style="color: #666; font-size: 0.9em; margin: 8px 0 16px;">
+      Выбери фон, чтобы легче было быть здесь.
+    </p>
+
+    <div class="nature-grid">
+      <button onclick="playNature('rain')" class="nature-btn rain">
+        <div class="icon">🌧️</div>
+        <div class="label">Дождь</div>
+        <div class="hint">для тишины и сна</div>
+      </button>
+
+      <button onclick="playNature('fire')" class="nature-btn fire">
+        <div class="icon">🔥</div>
+        <div class="label">Огонь</div>
+        <div class="hint">для уюта и тепла</div>
+      </button>
+
+      <button onclick="playNature('ocean')" class="nature-btn ocean">
+        <div class="icon">🌊</div>
+        <div class="label">Океан</div>
+        <div class="hint">для глубины и движения</div>
+      </button>
+    </div>
+
+    <button onclick="showWeather()" class="btn-secondary" style="margin-top: 16px;">
+      🌤️ Погода внутри
+    </button>
   </div>
 
   <!-- Настройки -->
@@ -124,6 +221,8 @@
       <button onclick="toggleTheme()">🌙 / ☀️ Тема</button>
       <button onclick="toggleSound()">🔊 / 🔇 Звук</button>
       <button onclick="showAbout()">ℹ️ О приложении</button>
+      <button onclick="exportData()">💾 Экспорт данных</button>
+      <button onclick="importData()">📂 Импорт данных</button>
       <button onclick="showDonate()">💚 Поддержать</button>
     </div>
   </div>
@@ -134,6 +233,7 @@
     <button onclick="navigateTo('calendar')" class="nav-item" aria-label="Календарь">📅</button>
     <button onclick="navigateTo('memory')" class="nav-item" aria-label="Память">📬</button>
     <button onclick="navigateTo('growth')" class="nav-item" aria-label="Рост">📈</button>
+    <button onclick="navigateTo('nature')" class="nav-item" aria-label="Погружение">🌊</button>
     <button onclick="navigateTo('settings')" class="nav-item" aria-label="Настройки">⚙️</button>
   </nav>
 

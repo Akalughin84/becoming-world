@@ -218,11 +218,12 @@ body.dark .legend {
 }
 
 .day {
-  transition: transform 0.1s;
+  transition: all 0.2s ease;
 }
 
 .day:hover {
-  transform: scale(1.2);
+  transform: scale(1.5);
+  z-index: 1;
 }
 
 /* === Календарь === */
@@ -409,4 +410,55 @@ button,
 /* === Прозрачность модального окна === */
 .becoming-modal {
   backdrop-filter: blur(4px);
+}
+
+/*=== стили для живого роста ===*/
+.growth-item {
+  background: #f9f9f9;
+  border: 1px solid #e0e0e0;
+  border-radius: 16px;
+  padding: 16px;
+  margin: 12px 0;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  opacity: 0.8;
+  transition: opacity 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.growth-item:hover {
+  background: #f0f8f0;
+  border-color: #8bc34a;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.growth-icon {
+  font-size: 1.8rem;
+  margin-right: 16px;
+  flex-shrink: 0;
+}
+
+.growth-text h3 {
+  margin: 0 0 4px;
+  font-size: 1.1rem;
+  color: #212529;
+  font-weight: 600;
+}
+
+.growth-text p {
+  margin: 0;
+  font-size: 0.95rem;
+  color: #666;
+  line-height: 1.4;
+}
+
+@keyframes grow {
+  0% { opacity: 0; transform: scale(0.8); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+.growth-item {
+  animation: grow 0.4s ease-out;
 }

@@ -126,7 +126,7 @@ function toggleSound() {
 
 // === Голос: Web Speech API ===
 function speak(text, emotion = "calm") {
-  if (!userData.isSoundEnabled || !window.speechSynthesis || !text) return;
+  if (!userData.isSoundEnabled || !window.speechSynthesis || !text || text.trim() === "") return;
   window.speechSynthesis.cancel();
 
   const utterance = new SpeechSynthesisUtterance(text);
@@ -185,6 +185,7 @@ function writeLetter() {
     showModal("✉️ Письмо отправлено.");
     speak("Письмо отправлено.", "soft");
   }
+  updateGrowthStatus();
 }
 
 // === Письмо прощению ===
@@ -217,6 +218,7 @@ function saveDream() {
     showModal("🌌 Сон сохранён.");
     speak("Сон сохранён. Я помню.", "soft");
   }
+  updateGrowthStatus();
 }
 
 // === Перечитать сны ===
@@ -275,6 +277,7 @@ function logSilence() {
       }
     }, 2000);
   }, 3 * 60 * 1000);
+  updateGrowthStatus();
 }
 
 // === Прервать тишину ===
@@ -368,58 +371,52 @@ function showMap() {
 }
 
 // === Словарь сердца (с группировкой) ===
-function showWords() {
-  const words = userData.wordCounts;
-  const growth = ["здесь", "связь", "покой", "вера", "дышать", "иди", "будь"];
-  const shadow = ["страх", "устал", "не знаю", "один"];
-
-  const list = Object.keys(words)
-    .sort((a, b) => words[b] - words[a])
-    .map(w => {
-      const category = growth.includes(w) ? "🌱" : shadow.includes(w) ? "🌫️" : "💭";
-      return `${category} ${w} • (${words[w]})`;
-    })
-    .join('\n') || "Пока пусто";
-
-  showModal(`📖 Словарь твоего сердца:\n${list}`);
-  speak("Словарь сердца показан.", "calm");
-}
-
-// === Сад (растёт от слов присутствия) ===
-function showGarden() {
-  const presenceWords = ["здесь", "сейчас", "есть", "чувствую", "помню", "вижу"];
-  const hereCount = presenceWords.reduce((sum, w) => sum + (userData.wordCounts[w] || 0), 0);
-  const flowers = "🌼".repeat(Math.max(1, Math.floor(hereCount / 3)));
-  const message = hereCount < 3
-    ? "Семя ещё в земле. Оно растёт."
-    : "Ты уже не садишь. Ты — сад.";
-  showModal(`🌷 Твой внутренний сад:\n${flowers}\n${message}`);
-  speak("Твой внутренний сад показан.", "calm");
-}
-
-// === Прозрение (персонализированное) ===
-function showInsight() {
-  const words = userData.wordCounts;
-  const dreams = userData.dreams.length;
-  const letters = userData.letters.length;
-
-  let insight = "Ты уже не идёшь сквозь туман. Ты — свет.";
-
-  if (words["здесь"] > 5) {
-    insight = "Ты уже не ищешь. Ты — здесь.";
-  } else if (words["покой"] > 3) {
-    insight = "Ты больше не бежишь. Ты — покой.";
-  } else if (dreams > 2) {
-    insight = `Ты не просто спишь. Ты помнишь сны — ${dreams} раза.`;
-  } else if (letters > 1) {
-    insight = "Ты пишешь себе. Это редкость. Ты — свой друг.";
-  } else if (words["страх"] && words["вера"] && words["вера"] > words["страх"]) {
-    insight = "Ты уже не боишься. Ты веришь — чаще, чем боишься.";
+const wordsCount = Object.keys(userData.wordCounts).length;
+  const wordsStatus = document.getElementById('words-status');
+  if (wordsStatus) {
+    if (wordsCount === 0) {
+      wordsStatus.textContent = "Пока тишина. Это тоже начало.";
+    } else if (wordsCount < 3) {
+      wordsStatus.textContent = `Ты уже сказал ${wordsCount} слов.`;
+    } else {
+      wordsStatus.textContent = `Ты уже сказал ${wordsCount} слов. Ты слышишь себя.`;
+    }
   }
 
-  showModal(`✨ ${insight}`);
-  speak(insight, "calm");
+// === Сад (растёт от слов присутствия) ===
+function updateGrowthStatus() {
+  // Сад
+  const hereCount = ["здесь", "сейчас", "есть", "чувствую"].reduce(
+    (sum, w) => sum + (userData.wordCounts[w] || 0), 0
+  );
+  const gardenStatus = document.getElementById('garden-status');
+  if (gardenStatus) {
+    if (hereCount < 2) {
+      gardenStatus.textContent = "Семя ещё в земле. Оно растёт.";
+    } else if (hereCount < 5) {
+      gardenStatus.textContent = "Первые ростки. Ты уже не только садишь.";
+    } else {
+      gardenStatus.textContent = "Ты уже не садишь. Ты — сад.";
+    }
+  }
 }
+// === Прозрение (персонализированное) ===
+const insightStatus = document.getElementById('insight-status');
+  if (insightStatus) {
+    const insight = generateInsightSnippet();
+    insightStatus.textContent = insight;
+  }
+
+// === Краткие прозрения для статуса ===
+function generateInsightSnippet() {
+  const words = userData.wordCounts;
+  if (words["здесь"] > 5) return "Ты уже не ищешь. Ты — здесь.";
+  if (words["покой"] > 3) return "Ты больше не бежишь. Ты — покой.";
+  if (words["связь"] > 2) return "Ты не один. Ты — связь.";
+  if (words["вера"] > words["страх"]) return "Ты уже не боишься. Ты — вера.";
+  return "Что-то уже меняется...";
+}
+
 
 // === Погода внутри (на основе баланса слов) ===
 function showWeather() {
@@ -627,6 +624,7 @@ function markPresence() {
   } else {
     showModal("🌱 Ты уже отметил это присутствие.");
   }
+  updateGrowthStatus();
 }
 
 // === Дневник ===
@@ -641,6 +639,7 @@ function writeJournal() {
     showModal("📖 Запись добавлена в дневник.");
     speak("Запись добавлена.", "soft");
   }
+  updateGrowthStatus();
 }
 
 function readJournal() {
@@ -738,29 +737,26 @@ function renderYearMap() {
 
 // === О приложении ===
 function showAbout() {
-  const aboutText = `🌱 Becoming — пространство для возвращения к себе
+  const aboutText = `🌱 Becoming — пространство для возвращения к себе.
 
 Здесь ты можешь:
+  • ✉️ Написать письмо себе — через год, через жизнь
+  • 🌌 Рассказать сон, который помнишь
+  • 🍃 Произнести слово, которое растёт: "здесь", "верь", "дышать"
+  • 🌷 Увидеть, как твой внутренний сад отвечает на "я был"
+  • 🌙 Отметить 3 минуты тишины — без дела, без смысла
+  • 🌿 Простить — себе, другому, прошлому
 
-• 🌿 **Быть без дела**  
-• 🕯 **Провести 3 минуты тишины**  
-• 📖 **Вести дневник чувств**  
-• 🌌 **Запомнить сны**  
-• ✉️ **Написать письмо себе**  
-• 🌷 **Увидеть свой внутренний сад**  
-• 🗺 **Увидеть карту роста**  
-• 🌧️ **Включить звуки природы**  
 Здесь нет:
   • Уведомлений
   • Рейтингов
   • "Должен"
   • Сравнений
 
-Это не приложение для продуктивности.  
-Это пространство для присутствия.
-
-Ты здесь.  
-Это уже победа.
+Есть только ты.
+И возможность сказать: 
+"Я здесь. 
+Это уже победа."
 
 Создано с заботой — Алексей Калугин, 2025`;
 
@@ -1023,14 +1019,68 @@ function navigateTo(screenId) {
 }
 
 // === Обновление прозрения на главной ===
+function getDailyInsight() {
+  const words = userData.wordCounts;
+  if (words["здесь"] > 5) return "Ты уже не ищешь. Ты — здесь.";
+  if (words["покой"] > 3) return "Ты больше не бежишь. Ты — покой.";
+  if (words["связь"] > 2) return "Ты не один. Ты — связь.";
+  if (words["вера"] > words["страх"]) return "Ты уже не боишься. Ты — вера.";
+  if (words["сон"] > 5) return "Ты молчишь. Это не пустота. Это наполнение.";
+  return "Что-то уже меняется...";
+}
+
 function updateDailyInsight() {
   const insightEl = document.getElementById('daily-insight');
   if (insightEl) {
-    // Можно использовать showInsight(), но просто текст для примера
-    const insight = "Ты уже не ищешь. Ты — здесь.";
+    const insight = getDailyInsight();
     insightEl.textContent = insight;
   }
 }
+
+// === Случайное присутствие (шёпот) ===
+function randomWhisper() {
+  const whispers = [
+    "Ты уже начал.",
+    "Я помню тебя.",
+    "Ты здесь. Это уже победа.",
+    "Ты не один."
+  ];
+  if (Math.random() < 0.1) {
+    const whisper = whispers[Math.floor(Math.random() * whispers.length)];
+    showModal(`✨ ${whisper}`);
+    speak(whisper, "soft");
+  }
+}
+
+// Запускаем каждые 15 минут
+setInterval(randomWhisper, 15 * 60 * 1000);
+
+// === Загрузка интерфейса ===
+document.addEventListener('DOMContentLoaded', () => {
+  const time = getTimeOfDay();
+  const word = getDailyWord();
+  const greeting = document.querySelector('.greeting');
+  if (greeting) {
+    const recentWords = Object.keys(userData.wordCounts)
+      .filter(w => userData.wordCounts[w] > 0)
+      .sort((a, b) => userData.wordCounts[b] - userData.wordCounts[a])
+      .slice(0, 2)
+      .join(", ");
+
+    const personal = recentWords ? `Сегодня ты сказал: ${recentWords}.` : "Ты здесь. Это уже победа.";
+
+    greeting.innerHTML = `${time.emoji} ${time.name}<br>Ты здесь. Это уже победа.<br><span class="daily-word">🌱 Слово дня: ${word}</span><br><small>${personal}</small>`;
+    speak(`${time.name}. Ты здесь. Это уже победа. Слово дня: ${word}`, "soft");
+  }
+
+  // ... остальной код инициализации
+  updateUI();
+  renderCalendar();
+  updateSoundUI();
+  navigateTo('home');
+  updateDailyInsight();
+  updateGrowthStatus();
+});
 
 // === Загрузка интерфейса ===
 document.addEventListener('DOMContentLoaded', () => {
@@ -1060,8 +1110,5 @@ document.addEventListener('DOMContentLoaded', () => {
   updateSoundUI();
   navigateTo('home');         // Открываем главную
   updateDailyInsight();       // Обновляем прозрение
+  updateGrowthStatus();
 });
-
-
-
-

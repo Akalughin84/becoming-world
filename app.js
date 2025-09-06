@@ -93,22 +93,28 @@ function applyTimeTheme() {
 
 // === Голос: Web Speech API ===
 function speak(text, emotion = "calm") {
-  if (!window.speechSynthesis) return;
+  if (!window.speechSynthesis || !text) return;
   window.speechSynthesis.cancel();
   const utterance = new SpeechSynthesisUtterance(text);
   utterance.lang = 'ru-RU';
   utterance.rate = 0.9;
   utterance.pitch = 0.8;
+  
+  // Используем предпочтительный голос
+  if (preferredVoice) {
+    utterance.voice = preferredVoice;
+  }
 
+  // Настройка интонации
   if (emotion === "soft") {
     utterance.rate = 0.7;
-    utterance.pitch = 0.7;
+    utterance.pitch = 0.6;
   } else if (emotion === "urgent") {
     utterance.rate = 1.1;
     utterance.pitch = 1.0;
   } else if (emotion === "calm") {
     utterance.rate = 0.8;
-    utterance.pitch = 0.75;
+    utterance.pitch = 0.7;
   }
 
   window.speechSynthesis.speak(utterance);
@@ -979,5 +985,6 @@ document.addEventListener('DOMContentLoaded', () => {
   updateUI();
   renderCalendar(); // Запуск календаря
 });
+
 
 

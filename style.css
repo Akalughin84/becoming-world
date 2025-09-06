@@ -87,6 +87,19 @@ body.dark .menu-title {
   color: #999;
 }
 
+.menu-section h3 {
+  font-size: 0.9rem;
+  color: #666;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 12px;
+  font-weight: 600;
+}
+
+body.dark .menu-section h3 {
+  color: #999;
+}
+
 /* === Кнопки === */
 button {
   background: #f1f3f5;

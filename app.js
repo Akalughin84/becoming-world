@@ -912,6 +912,47 @@ function reviewDayFromCalendar(dateStr) {
   showModal(content);
 }
 
+// === Выбор приятного голоса ===
+let preferredVoice = null;
+
+function loadPreferredVoice() {
+  if (!window.speechSynthesis) return;
+
+  const voices = speechSynthesis.getVoices();
+
+  // Ищем русский женский или мягкий голос
+  preferredVoice = voices.find(voice => 
+    voice.lang.startsWith('ru') && 
+    (
+      voice.name.toLowerCase().includes('female') || 
+      voice.name.toLowerCase().includes('женский') || 
+      voice.name.toLowerCase().includes('alena') || 
+      voice.name.toLowerCase().includes('alyss')
+    )
+  );
+
+  // Если не нашли — любой русский
+  if (!preferredVoice) {
+    preferredVoice = voices.find(voice => voice.lang.startsWith('ru'));
+  }
+
+  // Если и нет русского — берём первый доступный
+  if (!preferredVoice && voices.length > 0) {
+    preferredVoice = voices[0];
+  }
+}
+
+// Загружаем голоса после инициализации
+if ('speechSynthesis' in window) {
+  // В некоторых браузерах голоса появляются только после события
+  window.speechSynthesis.getVoices();
+  setTimeout(() => {
+    window.speechSynthesis.getVoices(); // второй вызов для надёжности
+    loadPreferredVoice();
+  }, 100);
+  setTimeout(loadPreferredVoice, 500); // подстраховка
+}
+
 // === Загрузка интерфейса ===
 document.addEventListener('DOMContentLoaded', () => {
   const time = getTimeOfDay();
@@ -938,4 +979,5 @@ document.addEventListener('DOMContentLoaded', () => {
   updateUI();
   renderCalendar(); // Запуск календаря
 });
+
 

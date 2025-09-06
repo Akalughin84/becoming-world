@@ -25,9 +25,6 @@
       <button onclick="markPresence()" class="btn-primary pulse-hint">
         ✅ Я был
       </button>
-      <button onclick="logSilence()" class="btn-secondary">
-        🕯️ 3 мин тишины
-      </button>
     </div>
 
     <!-- Подсказка-проводник -->
@@ -88,7 +85,7 @@
         <button onclick="readJournal()">📖 Перечитать дневник</button>
       </div>
     </div>
-
+    
     <!-- 💌 Письма себе -->
     <div class="memory-section">
       <h3 class="memory-title">💌 Письма себе</h3>
@@ -113,6 +110,35 @@
     <div class="menu-buttons">
       <button onclick="saveDream()">💭 Рассказать сон</button>
       <button onclick="readDreams()">📚 Перечитать сны</button>
+    </div>
+  </div>
+</div>
+
+<!-- Ритуалы -->
+<div id="rituals" class="screen">
+  <h2>🌅🌙 Ритуалы дня</h2>
+
+  <div class="ritual-section">
+    <h3 class="ritual-title">🌅 Утро</h3>
+    <div class="menu-buttons">
+      <button onclick="morningRitual()">🌤️ Начать утро</button>
+      <button onclick="ritualBreathe()">🌬️ Дыхание</button>
+    </div>
+  </div>
+
+  <div class="ritual-section">
+    <h3 class="ritual-title">🧘 Практики</h3>
+    <div class="menu-buttons">
+      <button onclick="logSilence()">🕯️ 3 мин тишины</button>
+      <button onclick="ritualMeditation()">🧘 Медитация (5 мин)</button>
+    </div>
+  </div>
+
+  <div class="ritual-section">
+    <h3 class="ritual-title">🌙 Вечер</h3>
+    <div class="menu-buttons">
+      <button onclick="eveningRitual()">🌌 Завершить день</button>
+      <button onclick="writeGratitude()">🌱 Благодарность за день</button>
     </div>
   </div>
 </div>
@@ -232,6 +258,7 @@
     <button onclick="navigateTo('home')" class="nav-item active" aria-label="Главная">🏠</button>
     <button onclick="navigateTo('calendar')" class="nav-item" aria-label="Календарь">📅</button>
     <button onclick="navigateTo('memory')" class="nav-item" aria-label="Память">📬</button>
+    <button onclick="navigateTo('rituals')" class="nav-item" aria-label="Ритуалы">🌅</button>
     <button onclick="navigateTo('growth')" class="nav-item" aria-label="Рост">📈</button>
     <button onclick="navigateTo('nature')" class="nav-item" aria-label="Погружение">🌊</button>
     <button onclick="navigateTo('settings')" class="nav-item" aria-label="Настройки">⚙️</button>

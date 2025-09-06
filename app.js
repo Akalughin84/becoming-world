@@ -568,7 +568,7 @@ function toggleTheme() {
 // === Вспомогательные функции ===
 function logWord(word) {
   const key = word.toLowerCase().trim();
-  userData.wordCounts[word] = (userData.wordCounts[word] || 0) + 1;
+  userData.wordCounts[key] = (userData.wordCounts[key] || 0) + 1;
 }
 
 // === Присутствие: отметить день ===
@@ -985,6 +985,7 @@ document.addEventListener('DOMContentLoaded', () => {
   updateUI();
   renderCalendar(); // Запуск календаря
 });
+
 
 
 

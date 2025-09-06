@@ -1073,24 +1073,6 @@ document.addEventListener('DOMContentLoaded', () => {
     speak(`${time.name}. Ты здесь. Это уже победа. Слово дня: ${word}`, "soft");
   }
 
-// === Загрузка интерфейса ===
-document.addEventListener('DOMContentLoaded', () => {
-  const time = getTimeOfDay();
-  const word = getDailyWord();
-  const greeting = document.querySelector('.greeting');
-  if (greeting) {
-    const recentWords = Object.keys(userData.wordCounts)
-      .filter(w => userData.wordCounts[w] > 0)
-      .sort((a, b) => userData.wordCounts[b] - userData.wordCounts[a])
-      .slice(0, 2)
-      .join(", ");
-
-    const personal = recentWords ? `Сегодня ты сказал: ${recentWords}.` : "Ты здесь. Это уже победа.";
-
-    greeting.innerHTML = `${time.emoji} ${time.name}<br>Ты здесь. Это уже победа.<br><span class="daily-word">🌱 Слово дня: ${word}</span><br><small>${personal}</small>`;
-    speak(`${time.name}. Ты здесь. Это уже победа. Слово дня: ${word}`, "soft");
-  }
-
   const savedTheme = localStorage.getItem('theme');
   const isNight = time.key === 'night' || time.key === 'evening';
   const shouldAutoDark = savedTheme === 'dark' || (!savedTheme && isNight);
@@ -1103,4 +1085,3 @@ document.addEventListener('DOMContentLoaded', () => {
   updateDailyInsight();       // Обновляем прозрение
   updateGrowthStatus();
 });
-

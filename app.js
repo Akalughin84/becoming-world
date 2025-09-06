@@ -1073,15 +1073,6 @@ document.addEventListener('DOMContentLoaded', () => {
     speak(`${time.name}. Ты здесь. Это уже победа. Слово дня: ${word}`, "soft");
   }
 
-  // ... остальной код инициализации
-  updateUI();
-  renderCalendar();
-  updateSoundUI();
-  navigateTo('home');
-  updateDailyInsight();
-  updateGrowthStatus();
-});
-
 // === Загрузка интерфейса ===
 document.addEventListener('DOMContentLoaded', () => {
   const time = getTimeOfDay();
@@ -1112,3 +1103,4 @@ document.addEventListener('DOMContentLoaded', () => {
   updateDailyInsight();       // Обновляем прозрение
   updateGrowthStatus();
 });
+

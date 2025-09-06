@@ -356,36 +356,39 @@ function updateUI() {
 
 // === Карта роста (персонализированная) ===
 function showMap() {
-  let map = "🗺 Карта твоего пути\n\n";
+  let map = `🌱 Карта твоего пути
+`;
+
   GROWTH_AXES.forEach(ax => {
     const neg = userData.wordCounts[ax.neg] || 0;
     const pos = userData.wordCounts[ax.pos] || 0;
-    const diff = pos - neg;
-    const level = Math.max(0, Math.min(20, 10 + diff));
-    const bar = "🌑".repeat(20 - level) + "🌱".repeat(level);
-    const sign = diff >= 0 ? '+' : '';
-    map += `${ax.neg.toUpperCase()} ${bar} ${ax.pos.toUpperCase()} (${sign}${diff})\n`;
-  });
-  showModal(map);
-  speak("Карта твоего пути показана.", "calm");
-}
+    const total = neg + pos;
+    let percentage = total === 0 ? 50 : Math.round((pos / total) * 100);
+    const barLength = 20;
+    const filled = Math.round(barLength * (percentage / 100));
 
-// === Словарь сердца (с группировкой) ===
-const wordsCount = Object.keys(userData.wordCounts).length;
-  const wordsStatus = document.getElementById('words-status');
-  if (wordsStatus) {
-    if (wordsCount === 0) {
-      wordsStatus.textContent = "Пока тишина. Это тоже начало.";
-    } else if (wordsCount < 3) {
-      wordsStatus.textContent = `Ты уже сказал ${wordsCount} слов.`;
-    } else {
-      wordsStatus.textContent = `Ты уже сказал ${wordsCount} слов. Ты слышишь себя.`;
-    }
-  }
+    const bar = "▫️".repeat(barLength - filled) + "🟩".repeat(filled);
+
+    let status = "в равновесии";
+    if (percentage > 70) status = "в силе";
+    else if (percentage > 60) status = "преобладает";
+    else if (percentage < 30) status = "в тени";
+    else if (percentage < 40) status = "ослаблено";
+
+    map += `
+${ax.label}
+${ax.neg.toUpperCase()} → ${bar} ← ${ax.pos.toUpperCase()}
+(${neg} : ${pos}) — ${status}
+`;
+  });
+
+  showModal(map);
+  speak("Карта твоего пути обновлена.", "calm");
+}
 
 // === Сад (растёт от слов присутствия) ===
 function updateGrowthStatus() {
-  // Сад
+  // === Сад ===
   const hereCount = ["здесь", "сейчас", "есть", "чувствую"].reduce(
     (sum, w) => sum + (userData.wordCounts[w] || 0), 0
   );
@@ -395,17 +398,49 @@ function updateGrowthStatus() {
       gardenStatus.textContent = "Семя ещё в земле. Оно растёт.";
     } else if (hereCount < 5) {
       gardenStatus.textContent = "Первые ростки. Ты уже не только садишь.";
-    } else {
+    } else if (hereCount < 10) {
       gardenStatus.textContent = "Ты уже не садишь. Ты — сад.";
+    } else {
+      gardenStatus.textContent = "Ты — не сад. Ты — сезон.";
     }
   }
-}
-// === Прозрение (персонализированное) ===
-const insightStatus = document.getElementById('insight-status');
-  if (insightStatus) {
-    const insight = generateInsightSnippet();
-    insightStatus.textContent = insight;
+
+  // === Словарь сердца ===
+  const wordsCount = Object.keys(userData.wordCounts).length;
+  const wordsStatus = document.getElementById('words-status');
+  if (wordsStatus) {
+    if (wordsCount === 0) {
+      wordsStatus.textContent = "Пока тишина. Это тоже начало.";
+    } else if (wordsCount < 3) {
+      wordsStatus.textContent = `Ты уже сказал ${wordsCount} слов.`;
+    } else if (wordsCount < 6) {
+      wordsStatus.textContent = `Ты уже сказал ${wordsCount} слов. Ты слышишь себя.`;
+    } else {
+      wordsStatus.textContent = `Ты уже сказал ${wordsCount} слов. Твой язык — живой.`;
+    }
   }
+
+  // === Прозрение ===
+  const insightStatus = document.getElementById('insight-status');
+  if (insightStatus) {
+    insightStatus.textContent = generateInsightSnippet();
+  }
+
+  // === Предпросмотр карты роста ===
+  const mapPreview = document.getElementById('map-preview');
+  if (mapPreview) {
+    const axes = GROWTH_AXES.map(ax => {
+      const neg = userData.wordCounts[ax.neg] || 0;
+      const pos = userData.wordCounts[ax.pos] || 0;
+      const diff = pos - neg;
+      if (diff > 2) return ax.label;
+      if (diff < -2) return `тень ${ax.label}`;
+      return null;
+    }).filter(Boolean).slice(0, 2).join(", ") || "в движении";
+
+    mapPreview.textContent = `Ты в ${axes}.`;
+  }
+}
 
 // === Краткие прозрения для статуса ===
 function generateInsightSnippet() {
@@ -1016,6 +1051,10 @@ function navigateTo(screenId) {
   // Найдём кнопку, связанную с экраном
   const navButton = document.querySelector(`[onclick="navigateTo('${screenId}')"]`);
   if (navButton) navButton.classList.add('active');
+  // Если зашли на "рост" — обновим статус
+  if (screenId === 'growth') {
+    updateGrowthStatus();
+  }
 }
 
 // === Обновление прозрения на главной ===

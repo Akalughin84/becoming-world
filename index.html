@@ -3,96 +3,141 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="description" content="Becoming — приложение, которое помогает быть здесь и сейчас. Не для продуктивности. Для присутствия." />
-  <meta name="robots" content="noindex, nofollow" />
   <meta name="theme-color" content="#1a1a1a" />
+  <meta name="description" content="Becoming — приложение, которое помогает быть здесь и сейчас. Не для продуктивности. Для присутствия." />
   <title>Becoming — Ты здесь. Это уже победа.</title>
+  <!-- PWA -->
   <link rel="manifest" href="manifest.json" />
-  <link rel="icon" href="icons/icon-192.png" type="image/png" />
-  <link rel="apple-touch-icon" href="icons/icon-192.png" />
+  <link rel="icon" href="icon-192.png" type="image/png" />
+  <link rel="apple-touch-icon" href="icon-192.png" />
+  <!-- Стили -->
   <link rel="stylesheet" href="style.css" />
+  <!-- Предотвращение индексации -->
+  <meta name="robots" content="noindex, nofollow" />
 </head>
 <body>
-  <!-- Главная -->
-  <div id="home" class="screen active">
+  <div class="container">
     <h1>🌱 Becoming</h1>
     <p class="greeting">Загрузка...</p>
+
+    <!-- 🗺 Карта дня -->
+    <section class="menu-section">
+      <h2 class="menu-title">🗺 Карта дня</h2>
+      <p id="day-map-status">Загрузка...</p>
+      <button type="button" onclick="markPresence()">✅ Отметить присутствие</button>
+      <button
+        id="sound-toggle"
+        onclick="toggleSound()"
+        style="background: none; border: none; font-size: 1.5em; cursor: pointer; margin: 0 10px;"
+        title="Включить/выключить звук">
+        🔊
+      </button>
+    </section>
+
+    <!-- 📅 Карта года -->
+    <section class="menu-section">
+      <h2 class="menu-title">📅 Карта года</h2>
+      <div id="year-map">Загрузка календаря...</div>
+    </section>
+
+    <!-- 📖 Дневник -->
+    <section class="menu-section">
+      <h2 class="menu-title">📖 Дневник</h2>
+      <div class="menu-buttons">
+        <button type="button" onclick="writeJournal()">✍️ Записать переживание</button>
+        <button type="button" onclick="readJournal()">📚 Перечитать</button>
+      </div>
+    </section>
+
+    <!-- 🌅🌙 Ритуалы -->
+    <section class="menu-section">
+      <h2 class="menu-title">🌅🌙 Ритуалы</h2>
+      <div class="menu-buttons">
+        <button type="button" onclick="morningRitual()">🌅 Утренний ритуал</button>
+        <button type="button" onclick="eveningRitual()">🌙 Вечерний ритуал</button>
+      </div>
+    </section>
+
+    <!-- 📅 Визуальный календарь -->
+    <section class="menu-section">
+      <h2 class="menu-title">📅 Календарь</h2>
+      <div class="calendar-controls">
+        <button type="button" onclick="changeMonth(-1)">◀️</button>
+        <span id="calendar-month-year">Загрузка...</span>
+        <button type="button" onclick="changeMonth(1)">▶️</button>
+      </div>
+      <div id="calendar-grid" class="calendar-grid">
+        <!-- Дни месяца будут здесь -->
+      </div>
+    </section>
+
+    <!-- 📬 Письма и память -->
+    <section class="menu-section">
+      <h2 class="menu-title">📬 Письма и память</h2>
+      <div class="menu-buttons">
+        <button type="button" onclick="writeLetter()">📝 Написать письмо себе</button>
+        <button type="button" onclick="showForgiveness()">📬 Письмо прощению</button>
+        <button type="button" onclick="saveDream()">🌌 Записать сон</button>
+        <button type="button" onclick="readDreams()">📚 Перечитать сны</button>
+      </div>
+    </section>
+
+    <!-- 🧘 Присутствие и тишина -->
+    <section class="menu-section">
+      <h2 class="menu-title">🧘 Присутствие и тишина</h2>
+      <div class="menu-buttons">
+        <button type="button" onclick="logSilence()">🕯 Просто быть (3 мин)</button>
+      </div>
+    </section>
+
+    <!-- 🌧️ Природа и состояние -->
+    <section class="menu-section">
+      <h2 class="menu-title">🌧️ Природа и состояние</h2>
+      <div class="menu-buttons">
+        <button type="button" onclick="playNature('rain')">🌧️ Дождь</button>
+        <button type="button" onclick="playNature('fire')">🔥 Огонь</button>
+        <button type="button" onclick="playNature('ocean')">🌊 Океан</button>
+        <button type="button" onclick="showWeather()">🌤️ Погода внутри</button>
+      </div>
+    </section>
+
+    <!-- 📈 Рефлексия и рост -->
+    <section class="menu-section">
+      <h2 class="menu-title">📈 Рефлексия и рост</h2>
+      <div class="menu-buttons">
+        <button type="button" onclick="showGarden()">🌷 Сад</button>
+        <button type="button" onclick="showInsight()">✨ Прозрение</button>
+        <button type="button" onclick="showMap()">🗺 Карта роста</button>
+        <button type="button" onclick="showWords()">📖 Словарь сердца</button>
+      </div>
+    </section>
+
+    <!-- ⚙️ Инструменты -->
+    <section class="menu-section">
+      <h2 class="menu-title">⚙️ Инструменты</h2>
+      <div class="menu-buttons">
+        <button type="button" onclick="toggleTheme()">🌙 / ☀️ Тема</button>
+      </div>
+    </section>
     
-    <div class="home-actions">
-      <button onclick="markPresence()" class="btn-primary">✅ Я был</button>
-      <button onclick="logSilence()" class="btn-secondary">🕯 3 мин тишины</button>
-    </div>
+    <!-- ℹ️ О приложении -->
+    <section class="menu-section">
+      <div class="menu-buttons">
+        <button type="button" onclick="showAbout()">ℹ️ О приложении</button>
+      </div>
+    </section>
 
-    <div class="insight-box">
-      <p id="daily-insight">Загрузка прозрения...</p>
-    </div>
+    <!-- Подвал -->
+    <p class="footer">
+      Создано с заботой — <strong>Алексей Калугин</strong>, 2025<br>
+      <small>Не для продуктивности. Для присутствия.<br>Ты здесь. Это уже победа.</small><br><br>
+      <button class="small" type="button" onclick="showDonate()">
+        💚 Поддержать Becoming (добровольно)
+      </button>
+    </p>
   </div>
 
-  <!-- Календарь -->
-  <div id="calendar" class="screen">
-    <h2>📅 Календарь</h2>
-    <div class="calendar-controls">
-      <button onclick="changeMonth(-1)">◀️</button>
-      <span id="calendar-month-year">Загрузка...</span>
-      <button onclick="changeMonth(1)">▶️</button>
-    </div>
-    <div id="calendar-grid" class="calendar-grid"></div>
-  </div>
-
-  <!-- Память -->
-  <div id="memory" class="screen">
-    <h2>📬 Память</h2>
-    <div class="menu-buttons">
-      <button onclick="writeJournal()">✍️ Дневник</button>
-      <button onclick="writeLetter()">✉️ Письмо себе</button>
-      <button onclick="showForgiveness()">📬 Прощение</button>
-      <button onclick="saveDream()">🌌 Сон</button>
-      <button onclick="readDreams()">📚 Сны</button>
-    </div>
-  </div>
-
-  <!-- Рост -->
-  <div id="growth" class="screen">
-    <h2>📈 Рост</h2>
-    <div class="menu-buttons">
-      <button onclick="showGarden()">🌷 Сад</button>
-      <button onclick="showMap()">🗺 Карта роста</button>
-      <button onclick="showWords()">📖 Словарь сердца</button>
-      <button onclick="showInsight()">✨ Прозрение</button>
-    </div>
-  </div>
-
-  <!-- Природа -->
-  <div id="nature" class="screen">
-    <h2>🌧️ Природа</h2>
-    <div class="menu-buttons">
-      <button onclick="playNature('rain')">🌧️ Дождь</button>
-      <button onclick="playNature('fire')">🔥 Огонь</button>
-      <button onclick="playNature('ocean')">🌊 Океан</button>
-      <button onclick="showWeather()">🌤️ Погода внутри</button>
-    </div>
-  </div>
-
-  <!-- Настройки -->
-  <div id="settings" class="screen">
-    <h2>⚙️ Настройки</h2>
-    <div class="menu-buttons">
-      <button onclick="toggleTheme()">🌙 / ☀️ Тема</button>
-      <button onclick="toggleSound()">🔊 / 🔇 Звук</button>
-      <button onclick="showAbout()">ℹ️ О приложении</button>
-      <button onclick="showDonate()">💚 Поддержать</button>
-    </div>
-  </div>
-
-  <!-- Нижняя навигация -->
-  <nav class="bottom-nav">
-    <button onclick="navigateTo('home')" class="nav-item active">🏠</button>
-    <button onclick="navigateTo('calendar')" class="nav-item">📅</button>
-    <button onclick="navigateTo('memory')" class="nav-item">📬</button>
-    <button onclick="navigateTo('growth')" class="nav-item">📈</button>
-    <button onclick="navigateTo('settings')" class="nav-item">⚙️</button>
-  </nav>
-
+  <!-- Скрипт -->
   <script src="app.js" defer></script>
 </body>
 </html>

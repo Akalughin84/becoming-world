@@ -1002,6 +1002,33 @@ if ('speechSynthesis' in window) {
   setTimeout(loadPreferredVoice, 500); // подстраховка
 }
 
+// === Навигация между экранами ===
+function navigateTo(screenId) {
+  document.querySelectorAll('.screen').forEach(s => {
+    s.classList.remove('active');
+  });
+  const screen = document.getElementById(screenId);
+  if (screen) screen.classList.add('active');
+
+  document.querySelectorAll('.nav-item').forEach(btn => {
+    btn.classList.remove('active');
+  });
+
+  // Найдём кнопку, связанную с экраном
+  const navButton = document.querySelector(`[onclick="navigateTo('${screenId}')"]`);
+  if (navButton) navButton.classList.add('active');
+}
+
+// === Обновление прозрения на главной ===
+function updateDailyInsight() {
+  const insightEl = document.getElementById('daily-insight');
+  if (insightEl) {
+    // Можно использовать showInsight(), но просто текст для примера
+    const insight = "Ты уже не ищешь. Ты — здесь.";
+    insightEl.textContent = insight;
+  }
+}
+
 // === Загрузка интерфейса ===
 document.addEventListener('DOMContentLoaded', () => {
   const time = getTimeOfDay();
@@ -1028,5 +1055,6 @@ document.addEventListener('DOMContentLoaded', () => {
   updateUI();
   renderCalendar(); // Запуск календаря
   updateSoundUI();
+  navigateTo('home');         // Открываем главную
+  updateDailyInsight();       // Обновляем прозрение
 });
-

@@ -292,6 +292,69 @@ function readDreams() {
   showModal(`🌌 Твои сны:\n\n${list}`);
 }
 
+function ritualBreathe() {
+  let cycle = 0;
+  const total = 3;
+
+  const modal = document.createElement('div');
+  modal.className = 'becoming-modal';
+  modal.innerHTML = `
+    <div style="background: #1a1a1a; padding: 32px; border-radius: 16px; text-align: center; max-width: 300px;">
+      <h3>🌬️ Дыхание</h3>
+      <p>Вдох… Выдох…</p>
+      <p style="font-size: 2em; margin: 20px 0;">${cycle}/${total}</p>
+      <button onclick="this.closest('.becoming-modal').remove()" style="background: #333; color: #ccc; border: none; padding: 8px 16px; border-radius: 6px;">
+        Прервать
+      </button>
+    </div>
+  `;
+  document.body.appendChild(modal);
+
+  const counter = modal.querySelector('p:nth-child(3)');
+  const interval = setInterval(() => {
+    cycle++;
+    counter.textContent = `${cycle}/${total}`;
+    if (cycle >= total) {
+      clearInterval(interval);
+      setTimeout(() => {
+        modal.remove();
+        showModal("🌬️ Ты дышал. Это уже жизнь.");
+        logWord("жив");
+        updateGrowthStatus();
+      }, 1000);
+    }
+  }, 8000); // 4 секунды на вдох-выдох
+}
+
+function ritualMeditation() {
+  if (window.meditationTimer) {
+    showModal("🧘 Медитация уже идёт.");
+    return;
+  }
+
+  showModal("🧘 Медитация началась. 5 минут для тебя.", "silence");
+
+  if (!currentAudio) {
+    playNature('rain'); // или 'ocean'
+  }
+
+  window.meditationTimer = setTimeout(() => {
+    delete window.meditationTimer;
+    showModal("🧘 Ты был. Это уже победа.\nТы не делал. Ты просто был.");
+    speak("Ты был. Это уже победа.", "soft");
+
+    setTimeout(() => {
+      try {
+        const bell = new Audio('sounds/bell.mp3');
+        bell.volume = 0.4;
+        bell.play().catch(() => {});
+      } catch (e) {
+        console.warn("Не удалось воспроизвести звон.");
+      }
+    }, 2000);
+  }, 5 * 60 * 1000);
+}
+
 // === Просто быть (с ритуалом тишины) ===
 function logSilence() {
   if (window.silenceTimer) {
@@ -1411,6 +1474,7 @@ function updateGrowthStatus() {
     (sum, w) => sum + (userData.wordCounts[w] || 0), 0
   );
   const gardenStatus = document.getElementById('garden-status');
+  const svg = document.getElementById('garden-svg');
   if (gardenStatus) {
     if (hereCount < 2) {
       gardenStatus.textContent = "Семя ещё в земле. Оно растёт.";
@@ -1420,6 +1484,54 @@ function updateGrowthStatus() {
       gardenStatus.textContent = "Ты уже не садишь. Ты — сад.";
     } else {
       gardenStatus.textContent = "Ты — не сад. Ты — сезон.";
+    }
+  }
+
+  // === Визуальный сад (SVG) ===
+  if (svg) {
+    // Удаляем все элементы, кроме земли (rect)
+    Array.from(svg.children).forEach(child => {
+      if (child.tagName !== 'rect') {
+        svg.removeChild(child);
+      }
+    });
+
+    // Рисуем ростки
+    for (let i = 0; i < hereCount && i < 6; i++) {
+      const x = 20 + i * 16;
+      const height = 10 + Math.random() * 20;
+      const color = ['#8BC34A', '#4CAF50', '#66BB6A'][i % 3];
+
+      const stem = document.createElementNS("http://www.w3.org/2000/svg", "line");
+      stem.setAttribute("x1", x);
+      stem.setAttribute("y1", 50);
+      stem.setAttribute("x2", x);
+      stem.setAttribute("y2", 50 - height);
+      stem.setAttribute("stroke", color);
+      stem.setAttribute("stroke-width", "2");
+      stem.style.opacity = 0;
+      stem.style.transition = `opacity 0.3s ease ${i * 0.1}s`;
+      svg.appendChild(stem);
+
+      // Добавляем листики
+      if (i % 2 === 0) {
+        const leaf1 = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+        leaf1.setAttribute("cx", x - 5);
+        leaf1.setAttribute("cy", 50 - height + 5);
+        leaf1.setAttribute("r", "2");
+        leaf1.setAttribute("fill", color);
+        leaf1.style.opacity = 0;
+        leaf1.style.transition = `opacity 0.3s ease ${i * 0.1 + 0.2}s`;
+        svg.appendChild(leaf1);
+
+        setTimeout(() => {
+          leaf1.style.opacity = 1;
+        }, 100);
+      }
+
+      setTimeout(() => {
+        stem.style.opacity = 1;
+      }, 100);
     }
   }
 

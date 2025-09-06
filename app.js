@@ -45,6 +45,17 @@ const userData = {
 // === Глобальное состояние календаря ===
 let currentCalendarDate = new Date();
 
+function supportsStorage() {
+  try {
+    const test = '__test__';
+    localStorage.setItem(test, test);
+    localStorage.removeItem(test);
+    return true;
+  } catch (e) {
+    return false;
+  }
+}
+
 // === Загрузка/сохранение ===
 function loadData() {
   try {
@@ -1018,3 +1029,4 @@ document.addEventListener('DOMContentLoaded', () => {
   renderCalendar(); // Запуск календаря
   updateSoundUI();
 });
+

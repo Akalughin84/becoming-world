@@ -833,3 +833,51 @@ body.dark .memory-section .menu-buttons button {
 body.dark .memory-section .menu-buttons button:hover {
   background: #444;
 }
+/* === Раздел "Ритуалы" === */
+.ritual-section {
+  background: #f8f9fa;
+  border: 1px solid #e9ecef;
+  border-radius: 14px;
+  padding: 16px;
+  margin: 16px 0;
+}
+
+body.dark .ritual-section {
+  background: #2d2d2d;
+  border-color: #444;
+}
+
+.ritual-title {
+  font-size: 1em;
+  color: #2c7a2c;
+  margin: 0 0 12px;
+  font-weight: 600;
+}
+
+body.dark .ritual-title {
+  color: #66d966;
+}
+
+.ritual-section .menu-buttons button {
+  background: white;
+  border: 1px solid #dee2e6;
+  font-size: 0.98rem;
+  padding: 10px 14px;
+  transition: all 0.2s ease;
+}
+
+body.dark .ritual-section .menu-buttons button {
+  background: #333;
+  border-color: #555;
+  color: #ddd;
+}
+
+.ritual-section .menu-buttons button:hover {
+  background: #f1f3f5;
+  border-color: #adb5bd;
+  transform: translateY(-1px);
+}
+
+body.dark .ritual-section .menu-buttons button:hover {
+  background: #444;
+}

@@ -160,7 +160,7 @@ function speak(text, emotion = "calm") {
 
 // === Слово дня ===
 function getDailyWord() {
-  const today = new Date().toDateString();
+  const today = new Date().toDateString().split('T')[0];
   const usedToday = userData.dailyWords.filter(w =>
     new Date(w.date).toDateString() === today
   );
@@ -643,7 +643,7 @@ function toggleTheme() {
 
 // === Вспомогательные функции ===
 function logWord(word) {
-  const key = word.toLowerCase().trim();
+  const key = word.toLowerCase().trim().replace(/[^\wа-яё]/g, '');
   userData.wordCounts[key] = (userData.wordCounts[key] || 0) + 1;
 }
 
@@ -1078,6 +1078,7 @@ function updateDailyInsight() {
 }
 
 // === Случайное присутствие (шёпот) ===
+/*
 function randomWhisper() {
   const whispers = [
     "Ты уже начал.",
@@ -1094,6 +1095,7 @@ function randomWhisper() {
 
 // Запускаем каждые 15 минут
 setInterval(randomWhisper, 15 * 60 * 1000);
+*/
 
 // === Загрузка интерфейса ===
 document.addEventListener('DOMContentLoaded', () => {
@@ -1125,4 +1127,3 @@ document.addEventListener('DOMContentLoaded', () => {
   updateDailyInsight();       // Обновляем прозрение
   updateGrowthStatus();
 });
-

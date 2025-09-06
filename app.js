@@ -95,25 +95,10 @@ function applyTimeTheme() {
 function speak(text, emotion = "calm") {
   if (!window.speechSynthesis || !text) return;
   window.speechSynthesis.cancel();
+
   const utterance = new SpeechSynthesisUtterance(text);
   utterance.lang = 'ru-RU';
-  utterance.rate = 0.9;
-  utterance.pitch = 0.8;
-  
-  // Используем предпочтительный голос
-  if (preferredVoice) {
-    utterance.voice = preferredVoice;
-    window.speechSynthesis.speak(utterance);
-  } else {
-    setTimeout(() => {
-      if (preferredVoice) {
-        utterance.voice = preferredVoice;
-      }
-      window.speechSynthesis.speak(utterance);
-    }, 500);
-  }
-}
-  
+
   // Настройка интонации
   if (emotion === "soft") {
     utterance.rate = 0.7;
@@ -126,7 +111,18 @@ function speak(text, emotion = "calm") {
     utterance.pitch = 0.7;
   }
 
-  window.speechSynthesis.speak(utterance);
+  // Используем предпочтительный голос
+  if (preferredVoice) {
+    utterance.voice = preferredVoice;
+    window.speechSynthesis.speak(utterance);
+  } else {
+    setTimeout(() => {
+      if (preferredVoice) {
+        utterance.voice = preferredVoice;
+      }
+      window.speechSynthesis.speak(utterance);
+    }, 500);
+  }
 }
 
 // === Слово дня ===
@@ -994,6 +990,7 @@ document.addEventListener('DOMContentLoaded', () => {
   updateUI();
   renderCalendar(); // Запуск календаря
 });
+
 
 
 

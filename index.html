@@ -67,14 +67,44 @@
 
   <!-- Рост -->
   <div id="growth" class="screen">
-    <h2>📈 Рост</h2>
-    <div class="menu-buttons">
-      <button onclick="showGarden()">🌷 Сад</button>
-      <button onclick="showMap()">🗺 Карта роста</button>
-      <button onclick="showWords()">📖 Словарь сердца</button>
-      <button onclick="showInsight()">✨ Прозрение</button>
+  <h2>🌱 Внутренний ландшафт</h2>
+
+  <!-- Сад -->
+  <div class="growth-item" onclick="showGarden()">
+    <div class="growth-icon">🌷</div>
+    <div class="growth-text">
+      <h3>Твой сад</h3>
+      <p id="garden-status">Загрузка...</p>
     </div>
   </div>
+
+  <!-- Карта роста -->
+  <div class="growth-item" onclick="showMap()">
+    <div class="growth-icon">🗺️</div>
+    <div class="growth-text">
+      <h3>Твой путь</h3>
+      <p id="map-status">Глубина, связь, покой, вера</p>
+    </div>
+  </div>
+
+  <!-- Словарь сердца -->
+  <div class="growth-item" onclick="showWords()">
+    <div class="growth-icon">📖</div>
+    <div class="growth-text">
+      <h3>Язык сердца</h3>
+      <p id="words-status">Загрузка слов...</p>
+    </div>
+  </div>
+
+  <!-- Прозрение -->
+  <div class="growth-item" onclick="showInsight()">
+    <div class="growth-icon">✨</div>
+    <div class="growth-text">
+      <h3>Прозрение</h3>
+      <p id="insight-status">Что-то уже меняется...</p>
+    </div>
+  </div>
+</div>
 
   <!-- Природа -->
   <div id="nature" class="screen">

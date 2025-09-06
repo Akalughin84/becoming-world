@@ -103,8 +103,17 @@ function speak(text, emotion = "calm") {
   // Используем предпочтительный голос
   if (preferredVoice) {
     utterance.voice = preferredVoice;
+    window.speechSynthesis.speak(utterance);
+  } else {
+    setTimeout(() => {
+      if (preferredVoice) {
+        utterance.voice = preferredVoice;
+      }
+      window.speechSynthesis.speak(utterance);
+    }, 500);
   }
-
+}
+  
   // Настройка интонации
   if (emotion === "soft") {
     utterance.rate = 0.7;
@@ -985,6 +994,7 @@ document.addEventListener('DOMContentLoaded', () => {
   updateUI();
   renderCalendar(); // Запуск календаря
 });
+
 
 
 

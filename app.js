@@ -38,7 +38,8 @@ const userData = {
   rituals: {
     morning: [],
     evening: []
-  }
+  },
+  isSoundEnabled: true
 };
 
 // === Глобальное состояние календаря ===
@@ -47,6 +48,7 @@ let currentCalendarDate = new Date();
 // === Загрузка/сохранение ===
 function loadData() {
   try {
+    if (!supportsStorage()) return;
     const saved = localStorage.getItem('becoming_data');
     if (saved) {
       const parsed = JSON.parse(saved);
@@ -61,6 +63,7 @@ function loadData() {
 }
 
 function saveData() {
+  if (!supportsStorage()) return;
   try {
     localStorage.setItem('becoming_data', JSON.stringify(userData));
   } catch (e) {
@@ -91,9 +94,28 @@ function applyTimeTheme() {
   localStorage.setItem('theme', isNight ? 'dark' : 'light');
 }
 
+function updateSoundUI() {
+  const btn = document.getElementById('sound-toggle');
+  if (btn) {
+    btn.textContent = userData.isSoundEnabled ? '🔊' : '🔇';
+    btn.title = userData.isSoundEnabled ? 'Выключить звук' : 'Включить звук';
+  }
+}
+
+function toggleSound() {
+  userData.isSoundEnabled = !userData.isSoundEnabled;
+  saveData();
+  updateSoundUI(); // Обновит иконку
+  showModal(
+    userData.isSoundEnabled 
+      ? "🔊 Звук включён. Природа и голосовые подсказки активны." 
+      : "🔇 Звук выключен. Тишина — тоже присутствие."
+  );
+}
+
 // === Голос: Web Speech API ===
 function speak(text, emotion = "calm") {
-  if (!window.speechSynthesis || !text) return;
+  if (!userData.isSoundEnabled || !window.speechSynthesis || !text) return;
   window.speechSynthesis.cancel();
 
   const utterance = new SpeechSynthesisUtterance(text);
@@ -263,6 +285,11 @@ let currentAudio = null;
 let currentSound = null;
 
 function playNature(sound) {
+  if (!userData.isSoundEnabled) {
+    showModal("🔇 Звук выключен. Включи его в настройках.");
+    return;
+  }
+  
   if (currentAudio) {
     currentAudio.pause();
     currentAudio = null;
@@ -989,10 +1016,5 @@ document.addEventListener('DOMContentLoaded', () => {
 
   updateUI();
   renderCalendar(); // Запуск календаря
+  updateSoundUI();
 });
-
-
-
-
-
-

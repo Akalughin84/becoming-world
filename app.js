@@ -103,13 +103,17 @@ function loadData() {
   }
 }
 
+// === Сохранение данных (с защитой от переполнения) ===
 function saveData() {
   if (!supportsStorage()) return;
   try {
     localStorage.setItem('becoming_data', JSON.stringify(userData));
   } catch (e) {
     if (e.name === 'QuotaExceededError') {
-      showModal("⚠️ Слишком много данных. Очисти старые записи.");
+      showModal(
+        "⚠️ Слишком много данных. Очисти старые записи.\n\n" +
+        "Совет: экспортируй данные, а затем удали самые старые записи в дневнике, снах или письмах."
+      );
     } else {
       console.error("Ошибка сохранения:", e);
     }
@@ -883,7 +887,7 @@ function showDonate() {
   });
 }
 
-// === Модальное окно ===
+// === Модальное окно (с прокруткой) ===
 function showModal(message, type = null) {
   if (document.querySelector('.becoming-modal')) return;
 
@@ -891,10 +895,9 @@ function showModal(message, type = null) {
   modal.className = 'becoming-modal';
   modal.style.cssText = `
     position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-    background: rgba(0,0,0,0.85); color: #eee; display: flex;
+    background: rgba(0,0,0,0.85); display: flex;
     align-items: center; justify-content: center; z-index: 1000;
     font-family: 'Segoe UI', sans-serif; font-size: 16px;
-    animation: fadeIn 0.3s ease-out;
   `;
 
   let buttons = `
@@ -918,8 +921,10 @@ function showModal(message, type = null) {
   }
 
   modal.innerHTML = `
-    <div style="background: #1a1a1a; padding: 24px; border-radius: 12px; max-width: 400px; text-align: center;">
-      <p style="white-space: pre-line; margin: 0 0 16px; line-height: 1.5;">${message}</p>
+    <div style="background: #1a1a1a; padding: 24px; border-radius: 12px; max-width: 400px; width: 90vw;">
+      <div class="modal-content" style="max-height: 60vh; overflow-y: auto; margin: 0 0 16px; line-height: 1.5; color: #eee; white-space: pre-line;">
+        ${message}
+      </div>
       <div style="display: flex; justify-content: center; gap: 10px;">
         ${buttons}
       </div>
@@ -1702,13 +1707,16 @@ function gentleWhisper() {
   }, 1500);
 }
 
-// === Экспорт данных ===
+// === Экспорт данных (без ограничений) ===
 function exportData() {
-  const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(userData, null, 2));
+  const data = JSON.stringify(userData, null, 2);
+  const blob = new Blob([data], { type: 'application/json;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
-  a.href = dataStr;
+  a.href = url;
   a.download = `becoming-backup-${new Date().toISOString().slice(0, 10)}.json`;
   a.click();
+  setTimeout(() => URL.revokeObjectURL(url), 100); // очистка памяти
 }
 
 // === Импорт данных ===
@@ -1723,7 +1731,11 @@ function importData() {
     reader.onload = event => {
       try {
         const imported = JSON.parse(event.target.result);
+        
+        // Полная замена
+        Object.keys(userData).forEach(key => delete userData[key]);
         Object.assign(userData, imported);
+
         saveData();
         showModal("✅ Данные восстановлены.");
         updateUI();
